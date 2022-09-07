@@ -131,7 +131,7 @@ async def mtest(did, ctx, bot, arg):
     file = discord.File(f'text.jpg', filename='prom.jpg')
     embed.set_image(url='attachment://prom.jpg')
     embed.add_field(
-        name=char.name, value=f"Remining Ticket :{gac.ticket}\nPity Count :{gac.pity}")
+        name=char.name, value=f"Remaining Ticket :{gac.ticket}\nPity Count :{gac.pity}")
     await ctx.send(file=file, embed=embed)
 
 
