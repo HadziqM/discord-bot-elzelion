@@ -1,8 +1,10 @@
 import random
+import discord
 import numpy as np
 from discord.ext import commands
 from direc import *
 from base import *
+from board import *
 
 db = database()
 
@@ -178,6 +180,40 @@ class Minigame_Event(commands.Cog):
         await ctx.message.author.remove_roles(role1)
         await ctx.message.author.remove_roles(role2)
         await ctx.send("removed")
+
+    @commands.command()
+    async def lucky7(self, ctx, arg):
+        bg = cv2.imread(CARD_PATH+"\\board.jpg", cv2.IMREAD_UNCHANGED)
+        bg = cv2.cvtColor(bg, cv2.COLOR_BGRA2BGR)
+        board = put_text(arg, bg)
+        brd = board.copy()
+        for i in range(9):
+            brd = card_slot(brd, card_list[9], card_pos(i))
+        cv2.imwrite("board.jpg", brd)
+        await ctx.send(file=discord.File("board.jpg"))
+        await ctx.send("pick one 1-9")
+
+        def check(author):
+            def inner_check(message):
+                if message.author != author:
+                    return False
+                else:
+                    try:
+                        x = int(message.content)
+                        if 0 < x < 10:
+                            return True
+                        else:
+                            return False
+                    except:
+                        return False
+            return inner_check
+        msg = await self.bot.wait_for('message', check=check(ctx.author))
+        deck = card
+        random.shuffle(deck)
+        choice = int(msg.content) - 1
+        brd = card_slot(brd, card_list[deck[choice]], card_pos(choice))
+        cv2.imwrite("board.jpg", brd)
+        await ctx.send(file=discord.File("board.jpg"))
 
     @commands.command()
     async def match(self, ctx, arg):

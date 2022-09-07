@@ -13,5 +13,6 @@ RW_PATH = os.path.join(ROOT_DIR, 'bounty_r')
 TITLE_PATH = os.path.join(ROOT_DIR, 'title')
 GACHA_PATH = os.path.join(ROOT_DIR, 'gacha')
 GR_PATH = os.path.join(ROOT_DIR, 'gacha_r')
+CARD_PATH = os.path.join(ROOT_DIR, 'card')
 
 sys.path.insert(0, COG_PATH)
