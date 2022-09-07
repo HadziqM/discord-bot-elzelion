@@ -30,7 +30,7 @@ app = Quart(__name__)
 async def index():
     return await render_template('index.html')
 
-bot.loop.create_task(app.run_task('192.168.0.113'))
+bot.loop.create_task(app.run_task('127.0.0.1'))
 
 print('confirming token')
 bot.run(db.token)
