@@ -140,6 +140,9 @@ class character:
                 self.gender = 'Male'
             elif s[0] == False:
                 self.gender = 'Female'
+            sql = 'select boostcd from discord where char_id= %s '
+            cur.execute(sql % cid)
+            self.boostcd = cur.fetchone()[0]
         except:
             self.discord = None
             self.bounty = 0
@@ -344,6 +347,10 @@ class character:
                     'rb').read().hex()
         sql1 = '''UPDATE characters SET partner=(decode('%s','hex')) WHERE id= %s '''
         cur.execute(sql1 % (hexb, self.cid))
+
+    def set_boostcd(self, val):
+        cur.execute(
+            f'update discord set boostcd={val} where char_id = {self.cid}')
 
     def get_bounty_champion(self):
         cur.execute(

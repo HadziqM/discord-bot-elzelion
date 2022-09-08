@@ -183,37 +183,76 @@ class Minigame_Event(commands.Cog):
 
     @commands.command()
     async def lucky7(self, ctx, arg):
+        a = ctx.message.author.id
+        set_up()
+        try:
+            cid = check_disc(a)
+        except:
+            await ctx.send("you are not registered")
+            return
+        char = character(cid)
+        if char.bounty < int(arg):
+            await ctx.send("you dont have enough bounty coin")
+            return
         bg = cv2.imread(CARD_PATH+"\\board.jpg", cv2.IMREAD_UNCHANGED)
         bg = cv2.cvtColor(bg, cv2.COLOR_BGRA2BGR)
         board = put_text(arg, bg)
         brd = board.copy()
-        for i in range(9):
-            brd = card_slot(brd, card_list[9], card_pos(i))
-        cv2.imwrite("board.jpg", brd)
-        await ctx.send(file=discord.File("board.jpg"))
-        await ctx.send("pick one 1-9")
+        remain = 7
+        deck = [3, 4, 5, 6, 7, 8, 9]
+        while True:
+            brd = board.copy()
+            for i in range(remain):
+                brd = card_slot(brd, card_list[9], card_pos(i))
+            cv2.imwrite("board.jpg", brd)
+            await ctx.send(file=discord.File("board.jpg"))
+            await ctx.send(f"pick one 1-{remain}")
 
-        def check(author):
-            def inner_check(message):
-                if message.author != author:
-                    return False
-                else:
-                    try:
-                        x = int(message.content)
-                        if 0 < x < 10:
-                            return True
-                        else:
-                            return False
-                    except:
+            def check(author, remain):
+                def inner_check(message):
+                    if message.author != author:
                         return False
-            return inner_check
-        msg = await self.bot.wait_for('message', check=check(ctx.author))
-        deck = card
-        random.shuffle(deck)
-        choice = int(msg.content) - 1
-        brd = card_slot(brd, card_list[deck[choice]], card_pos(choice))
-        cv2.imwrite("board.jpg", brd)
-        await ctx.send(file=discord.File("board.jpg"))
+                    else:
+                        try:
+                            x = int(message.content)
+                            if 0 < x <= remain:
+                                return True
+                            else:
+                                return False
+                        except:
+                            return False
+                return inner_check
+            msg = await self.bot.wait_for('message', check=check(ctx.author, remain))
+            random.shuffle(deck)
+            choice = int(msg.content) - 1
+            brd = card_slot(brd, card_list[deck[choice]-1], card_pos(choice))
+            cv2.imwrite("board.jpg", brd)
+            await ctx.send(file=discord.File("board.jpg"))
+            if deck[choice] == 9:
+                remain -= 1
+                if remain == 2:
+                    await ctx.send("sorry you lose the game but you didnt lose coin since your insane luck to draw d card 7 times lol")
+                    brd = card_slot(brd, card_list[6], card_pos(deck.index(7)))
+                    cv2.imwrite("board.jpg", brd)
+                    await ctx.send(file=discord.File("board.jpg"))
+                    break
+                deck.remove(9-remain)
+                await ctx.send(f"you got another try with {remain} card\nand you got {int(arg)} bounty coin as bonus for getting **D** card")
+                char.add_bounty(int(arg))
+            elif deck[choice] == 8:
+                await ctx.send(f"you got another try with {remain} card\nand you got {int(arg)*2} bounty coin as bonus for getting **R** card")
+                char.add_bounty(int(arg)*2)
+            elif deck[choice] == 7:
+                await ctx.send(f"congrats you won the game, you win {int(arg)*7} Bounty Coin")
+                char.add_bounty(int(arg)*7)
+                break
+            else:
+                await ctx.send(f"sorry you lose the game, you lose {arg} Bounty Coin")
+                brd = card_slot(brd, card_list[6], card_pos(deck.index(7)))
+                cv2.imwrite("board.jpg", brd)
+                await ctx.send(file=discord.File("board.jpg"))
+                char.set_bounty(char.bounty-int(arg))
+                break
 
     @commands.command()
     async def match(self, ctx, arg):

@@ -1,5 +1,6 @@
 import discord
 import random
+from datetime import datetime as dt
 from discord.ext import commands
 from direc import *
 from base import *
@@ -189,8 +190,13 @@ class MHFZ_User_Interactive(commands.Cog):
         set_up()
         arg = check_disc(a)
         char = character(arg)
-        char.boost_on()
-        await ctx.channel.send(f"turn on {char.name} boost")
+        now = int(dt.timestamp(dt.now()))
+        if now >= char.boostcd:
+            char.boost_on()
+            char.set_boostcd(now+(60*60*24*7))
+            await ctx.channel.send(f"turn on {char.name} boost")
+        else:
+            await ctx.send(f"sorry this command is on cooldown for you till <t:{char.boostcd}:R>")
 
     @commands.command()
     async def join_guild(self, ctx, arg1):

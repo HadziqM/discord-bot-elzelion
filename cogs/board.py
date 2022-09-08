@@ -9,7 +9,7 @@ textd = (121, 44)
 textp = (846, 64)
 
 
-card_list = [1, 2, 3, 4, 5, 6, 7, "d", "r", "f"]
+card_list = [1, 2, 3, 4, 5, 6, 7, "r", "d", "f"]
 card_list = [CARD_PATH+"\\"+str(i)+".jpg" for i in card_list]
 
 
