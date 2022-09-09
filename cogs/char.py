@@ -2,6 +2,7 @@ import discord
 import random
 from datetime import datetime as dt
 from discord.ext import commands
+from discord.utils import get
 from direc import *
 from base import *
 
@@ -96,6 +97,11 @@ class MHFZ_User_Interactive(commands.Cog):
     @commands.command()
     async def id(self, ctx, arg):
         set_up()
+        b = [i for i in arg]
+        for i in range(len(b)):
+            if b[i] == "'":
+                b[i] = "''"
+        arg = ''.join(b)
         a = char_id(arg)
         await ctx.send(a)
 
@@ -272,7 +278,7 @@ class MHFZ_User_Interactive(commands.Cog):
         msg = await bot.wait_for('message', check=check(ctx.author), timeout=120)
         if 'n' in msg.content.lower():
             return await ctx.send("aborted")
-        role = await ctx.guild.create_role(name=f'ID:{arg}')
+        role = get(ctx.message.guild.roles, id=1017643913667936318)
         await ctx.author.add_roles(role)
         char.add_data(a, arg1)
         gac = gacha(a)

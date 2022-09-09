@@ -1,3 +1,4 @@
+from operator import mod
 import discord
 import random
 from discord.ext import commands
@@ -133,6 +134,35 @@ class Mod_Only_Command(commands.Cog):
         char.unreg()
         await role.delete()
         await ctx.channel.send('success')
+
+    @commands.command()
+    @commands.has_role(mod_id)
+    async def add_registered_role_all(self, ctx):
+        set_up()
+        mod = moderator()
+        a = mod.registered_disc_all()
+        role = get(ctx.message.guild.roles, id=1017643913667936318)
+        for i in a:
+            try:
+                user = await ctx.guild.fetch_member(int(i))
+                await user.add_roles(role)
+            except:
+                await ctx.send(f"discord id {i} has left server")
+        await ctx.send("success")
+
+    @commands.command()
+    @commands.has_role(mod_id)
+    async def del_registered_role_all(self, ctx):
+        set_up()
+        mod = moderator()
+        a = mod.registered_all()
+        for i in a:
+            try:
+                role = get(ctx.message.guild.roles, name=f'ID:{i}')
+                await role.delete()
+            except:
+                None
+        await ctx.send("success")
 
     @commands.command()
     @commands.has_role(mod_id)

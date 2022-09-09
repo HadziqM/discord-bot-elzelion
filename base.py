@@ -23,7 +23,7 @@ def numb(val):
 
 
 def char_id(inp):
-    sql = '''SELECT id FROM public.characters WHERE name='%s' '''
+    sql = '''SELECT id FROM public.characters WHERE name= '%s' '''
     cur.execute(sql % inp)
     log_i = cur.fetchall()
     log_i = convert(log_i)
@@ -463,6 +463,18 @@ class moderator:
 
     def disc_all(self):
         sql = 'select discord_id from discord where bounty is not null order by bounty desc'
+        cur.execute(sql)
+        a = cur.fetchall()
+        return convert(a)
+
+    def registered_all(self):
+        sql = 'select char_id from discord order by bounty desc'
+        cur.execute(sql)
+        a = cur.fetchall()
+        return convert(a)
+
+    def registered_disc_all(self):
+        sql = 'select discord_id from discord order by bounty desc'
         cur.execute(sql)
         a = cur.fetchall()
         return convert(a)
