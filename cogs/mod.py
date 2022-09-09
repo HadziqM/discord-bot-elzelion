@@ -1,4 +1,3 @@
-from operator import mod
 import discord
 import random
 from discord.ext import commands
@@ -129,10 +128,9 @@ class Mod_Only_Command(commands.Cog):
             return
         char = character(arg)
         user = await ctx.guild.fetch_member(char.discord)
-        role = get(user.guild.roles, name=f'ID:{arg}')
+        role = get(ctx.message.guild.roles, id=1017643913667936318)
         await user.remove_roles(role)
         char.unreg()
-        await role.delete()
         await ctx.channel.send('success')
 
     @commands.command()
@@ -172,7 +170,7 @@ class Mod_Only_Command(commands.Cog):
         set_up()
         char = character(arg2)
         user = await ctx.guild.fetch_member(did)
-        role = await ctx.guild.create_role(name=f'ID:{arg2}')
+        role = get(ctx.message.guild.roles, id=1017643913667936318)
         await user.add_roles(role)
         char.add_data(did, arg1)
         await ctx.channel.send(f'now {user} are registered to {char.name}')

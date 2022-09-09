@@ -245,6 +245,7 @@ class MHFZ_User_Interactive(commands.Cog):
         await ctx.channel.send("dm'd")
 
     @commands.command()
+    @commands.cooldown(1, 120, commands.BucketType.user)
     async def register(self, ctx, arg, arg1):
         bot = self.bot
         a = ctx.message.author.id
