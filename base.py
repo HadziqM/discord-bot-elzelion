@@ -1,4 +1,3 @@
-import re
 from data import *
 
 
@@ -143,6 +142,9 @@ class character:
             sql = 'select boostcd from discord where char_id= %s '
             cur.execute(sql % cid)
             self.boostcd = cur.fetchone()[0]
+            sql = 'select newbie from discord where char_id= %s '
+            cur.execute(sql % cid)
+            self.newbie = cur.fetchone()[0]
         except:
             self.discord = None
             self.bounty = 0
@@ -271,6 +273,40 @@ class character:
         self.download_save()
         self.download_partner()
 
+    def download_all(self):
+        a = ['savedata', 'decomyset', 'partner', 'hunternavi', 'otomoairou', 'platebox',
+             'platedata', 'platemyset', 'rengokudata', 'savemercenary', 'skin_hist']
+        b = [f'{SAVE_PATH}\\', f'_{self.cid}.bin']
+        for i in a:
+            sql = '''SELECT %s FROM characters WHERE id= %s '''
+            cur.execute(sql % (i, self.cid))
+            data = cur.fetchone()[0]
+            if data == None:
+                a.remove(i)
+            else:
+                wr = open(b[0]+i+b[1], 'wb')
+                wr.write(data)
+                wr.close()
+        return [(b[0]+a[i]+b[1]) for i in range(len(a))]
+
+    def upload_save(self):
+        hexa = open(f'{UPLOAD_PATH}\\savedata_{self.cid}.bin',
+                    'rb').read().hex()
+        sql = '''UPDATE characters SET savedata=(decode('%s','hex')) WHERE id= %s '''
+        cur.execute(sql % (hexa, self.cid))
+
+    def upload_part(self):
+        hexb = open(f'{UPLOAD_PATH}\\partner_{self.cid}.bin',
+                    'rb').read().hex()
+        sql1 = '''UPDATE characters SET partner=(decode('%s','hex')) WHERE id= %s '''
+        cur.execute(sql1 % (hexb, self.cid))
+
+    def upload_data(self, data):
+        hexa = open(f'{UPLOAD_PATH}\\{data}_{self.cid}.bin',
+                    'rb').read().hex()
+        sql = '''UPDATE characters SET %s=(decode('%s','hex')) WHERE id= %s '''
+        cur.execute(sql % (data, hexa, self.cid))
+
     def boost(self):
         sql = ''' select end_time from public.login_boost_state  WHERE char_id= %s '''
         cur.execute(sql % self.cid)
@@ -336,21 +372,19 @@ class character:
         sql = '''UPDATE characters SET skin_hist=(decode('%s','hex')) where id=%s  '''
         cur.execute(sql % (hexa, self.cid))
 
-    def upload_save(self):
-        hexa = open(f'{UPLOAD_PATH}\\savedata_{self.cid}.bin',
-                    'rb').read().hex()
-        sql = '''UPDATE characters SET savedata=(decode('%s','hex')) WHERE id= %s '''
-        cur.execute(sql % (hexa, self.cid))
-
-    def upload_part(self):
-        hexb = open(f'{UPLOAD_PATH}\\partner_{self.cid}.bin',
-                    'rb').read().hex()
-        sql1 = '''UPDATE characters SET partner=(decode('%s','hex')) WHERE id= %s '''
-        cur.execute(sql1 % (hexb, self.cid))
-
     def set_boostcd(self, val):
         cur.execute(
             f'update discord set boostcd={val} where char_id = {self.cid}')
+
+    def newbie_rw(self, bm):
+        direc = f'{RW_PATH}\\'+bm+'.bin'
+        a = open(direc, 'rb').read().hex()
+        event = f'~C03Newbie Reward {bm}'
+        desc = f'~C03{bm}'
+        sql = '''insert into distribution (character_id,type,event_name,description,data,bot) values (%s,1,'%s','%s',(decode('%s','hex')),true) '''
+        cur.execute(sql % (self.cid, event, desc, a))
+        sql = 'update discord set newbie=false where char_id= %s '
+        cur.execute(sql % self.cid)
 
     def get_bounty_champion(self):
         cur.execute(

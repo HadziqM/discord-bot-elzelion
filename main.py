@@ -18,13 +18,12 @@ bot = commands.Bot(command_prefix=db.command,
 print('start')
 
 extension = ['cogs.char', 'cogs.guide', 'cogs.gacha', 'cogs.game',
-             'cogs.server', 'cogs.bounty', 'cogs.mod', 'cogs.test']
+             'cogs.server', 'cogs.bounty', 'cogs.mod', 'cogs.general']
 if __name__ == '__main__':
     for i in extension:
         bot.load_extension(i)
 
 # app = Quart(__name__)
-
 
 # @app.route("/")
 # async def index():

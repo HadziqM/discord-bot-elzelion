@@ -245,6 +245,43 @@ class MHFZ_User_Interactive(commands.Cog):
         await ctx.channel.send("dm'd")
 
     @commands.command()
+    async def mysave_all(self, ctx):
+        a = ctx.message.author.id
+        set_up()
+        arg = check_disc(a)
+        char = character(arg)
+        user = await self.bot.fetch_user(int(char.discord))
+        list = char.download_all()
+        for i in list:
+            await user.send(file=discord.File(i))
+        await user.send(f"downloaded all {char.name} not empty character data")
+        await ctx.channel.send("dm'd")
+
+    @commands.command()
+    async def claim_newb(self, ctx):
+        list = ["BGM01", "BGM02", "BGM03", "BGM04", "BGM05", "BGM06"]
+        if arg not in list:
+            await ctx.send("i cant recognize set, check your spelling")
+            return
+        a = ctx.message.author.id
+        set_up()
+        try:
+            arg = check_disc(a)
+        except:
+            await ctx.send("you are not registered")
+            return
+        char = character(arg)
+        if char.newbie == False:
+            await ctx.send("you already claim once")
+            return
+        else:
+            gr = int(char.gr)
+            if 200 <= gr < 500:
+                await ctx.send("reward already discributed")
+            else:
+                await ctx.send("GR requirement not met")
+
+    @commands.command()
     @commands.cooldown(1, 120, commands.BucketType.user)
     async def register(self, ctx, arg, arg1):
         bot = self.bot

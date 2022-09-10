@@ -85,16 +85,15 @@ class GeneralCog(commands.Cog):
                     mer = proc[i]
                     res = str(mer).split("'>")[0]
                     oke.append(res)
-                if filename == 'savedata_rain.bin':
-                    await message.attachments[0].save(fp=f'{UPLOAD_PATH}\\savedata_{ck}.bin')
-                    char.upload_save()
-                    await b.send(f'uploaded {char.name} savedata to server')
-                    await ch2.send(f'{b} save downloaded')
-                elif filename == 'partner_rain.bin':
-                    await message.attachments[0].save(fp=f'{UPLOAD_PATH}\\partner_{ck}.bin')
-                    await b.send(f'uploaded {char.name} partner data to server')
-                    char.upload_part()
-                    await ch2.send(f'{b} partner downloaded')
+                t_file = ['savedata', 'decomyset', 'partner', 'hunternavi', 'otomoairou', 'platebox',
+                          'platedata', 'platemyset', 'rengokudata', 'savemercenary', 'skin_hist']
+                s_file = [i+'_rain' for i in t_file]
+                if filename in s_file:
+                    order = s_file.index(filename)
+                    await message.attachments[0].save(fp=f'{UPLOAD_PATH}\\{t_file[order]}_{ck}.bin')
+                    char.upload_data(t_file[order])
+                    await b.send(f'uploaded {char.name} {t_file[order]} to server')
+                    await ch2.send(f'{b} {t_file[order]} downloaded')
                 else:
                     await channel.send(b)
                     for i in range(len(oke)):

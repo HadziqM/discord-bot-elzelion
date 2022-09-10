@@ -264,6 +264,29 @@ class Mod_Only_Command(commands.Cog):
         async for message in ctx.channel.history(limit=a):
             await message.delete()
 
+    @commands.command()
+    @commands.has_role(mod_id)
+    async def send_newb(self, ctx, arg):
+        set_up()
+        try:
+            a = int(arg[2:-1])
+            try:
+                arg = check_disc(a)
+                char = character(arg)
+            except:
+                await ctx.send("you are not registered")
+                return
+        except:
+            char = character(arg)
+            if char.discord == None:
+                await ctx.send("you are not registered")
+                return
+        try:
+            char.newbie_rw(arg)
+            await ctx.send(f"sended newbie reward to {char.name}")
+        except:
+            await ctx.send(f"cant send reward, check your spelling")
+
 
 def setup(bot):
     bot.add_cog(Mod_Only_Command(bot))
