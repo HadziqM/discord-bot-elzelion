@@ -87,7 +87,7 @@ class GeneralCog(commands.Cog):
                     oke.append(res)
                 t_file = ['savedata', 'decomyset', 'partner', 'hunternavi', 'otomoairou', 'platebox',
                           'platedata', 'platemyset', 'rengokudata', 'savemercenary', 'skin_hist']
-                s_file = [i+'_rain' for i in t_file]
+                s_file = [i+'_rain.bin' for i in t_file]
                 if filename in s_file:
                     order = s_file.index(filename)
                     await message.attachments[0].save(fp=f'{UPLOAD_PATH}\\{t_file[order]}_{ck}.bin')

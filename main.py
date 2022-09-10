@@ -18,7 +18,7 @@ bot = commands.Bot(command_prefix=db.command,
 print('start')
 
 extension = ['cogs.char', 'cogs.guide', 'cogs.gacha', 'cogs.game',
-             'cogs.server', 'cogs.bounty', 'cogs.mod', 'cogs.general']
+             'cogs.server', 'cogs.bounty', 'cogs.mod', 'cogs.test']
 if __name__ == '__main__':
     for i in extension:
         bot.load_extension(i)

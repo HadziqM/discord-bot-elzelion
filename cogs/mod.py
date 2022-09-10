@@ -266,7 +266,7 @@ class Mod_Only_Command(commands.Cog):
 
     @commands.command()
     @commands.has_role(mod_id)
-    async def send_newb(self, ctx, arg):
+    async def send_newb(self, ctx, arg, arg1):
         set_up()
         try:
             a = int(arg[2:-1])
@@ -282,7 +282,7 @@ class Mod_Only_Command(commands.Cog):
                 await ctx.send("you are not registered")
                 return
         try:
-            char.newbie_rw(arg)
+            char.newbie_rw(arg1)
             await ctx.send(f"sended newbie reward to {char.name}")
         except:
             await ctx.send(f"cant send reward, check your spelling")

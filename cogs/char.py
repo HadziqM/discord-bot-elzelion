@@ -258,7 +258,7 @@ class MHFZ_User_Interactive(commands.Cog):
         await ctx.channel.send("dm'd")
 
     @commands.command()
-    async def claim_newb(self, ctx):
+    async def claim_newb(self, ctx, arg):
         list = ["BGM01", "BGM02", "BGM03", "BGM04", "BGM05", "BGM06"]
         if arg not in list:
             await ctx.send("i cant recognize set, check your spelling")
