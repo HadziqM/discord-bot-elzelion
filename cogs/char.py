@@ -266,17 +266,18 @@ class MHFZ_User_Interactive(commands.Cog):
         a = ctx.message.author.id
         set_up()
         try:
-            arg = check_disc(a)
+            cid = check_disc(a)
         except:
             await ctx.send("you are not registered")
             return
-        char = character(arg)
+        char = character(cid)
         if char.newbie == False:
             await ctx.send("you already claim once")
             return
         else:
             gr = int(char.gr)
             if 200 <= gr < 500:
+                char.newbie_rw(arg)
                 await ctx.send("reward already discributed")
             else:
                 await ctx.send("GR requirement not met")

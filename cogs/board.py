@@ -14,7 +14,7 @@ card_list = [CARD_PATH+"\\"+str(i)+".jpg" for i in card_list]
 
 
 def put_text(text, bg):
-    text = str(text)+"Bc"
+    text = str(text)+"Tkt"
     font = cv2.FONT_HERSHEY_COMPLEX_SMALL
     size = cv2.getTextSize(text, font, 1, 1)[0]
     x = int((textd[0] - size[0])/2 + textp[0])

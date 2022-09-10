@@ -1,4 +1,6 @@
 import random
+from secrets import choice
+from tracemalloc import start
 import discord
 import numpy as np
 from discord.ext import commands
@@ -167,6 +169,91 @@ async def purge(a, channel):
         await message.delete()
 
 
+async def start_deck(bg, remain, ctx):
+    for i in range(remain):
+        brd = card_slot(brd, card_list[9], card_pos(i))
+    cv2.imwrite("board.jpg", brd)
+    await ctx.send(file=discord.File("board.jpg"))
+    await ctx.send(f"pick one 1-{remain}")
+    return bg
+
+
+async def check_deck(deck, bg, ctx, bot):
+    remain = len(deck)
+
+    def check(author, remain):
+        def inner_check(message):
+            if message.author != author:
+                return False
+            else:
+                try:
+                    x = int(message.content)
+                    if 0 < x <= remain:
+                        return True
+                    else:
+                        return False
+                except:
+                    return False
+        return inner_check
+    msg = await bot.wait_for('message', check=check(ctx.author, remain))
+    random.shuffle(deck)
+    choice = int(msg.content) - 1
+    bg = card_slot(bg, card_list[deck[choice]-1], card_pos(choice))
+    cv2.imwrite("board.jpg", bg)
+    await ctx.send(file=discord.File("board.jpg"))
+    return bg, choice
+
+
+async def wait_player(user, ctx, bot):
+    player = [ctx.guild.get_member(i) for i in user]
+    while True:
+        def check(author):
+            def inner_check(message):
+                if message.author not in author:
+                    return False
+                else:
+                    x = message.content
+                    if x == "y" or x == "Y" or x == "n" or x == "N":
+                        return True
+                    else:
+                        return False
+            return inner_check
+        msg = await bot.wait_for('message', check=check(player))
+        if msg.content == "n" or msg.content == "N":
+            await ctx.send(f" {msg.author} doesnt aprove the match")
+            return 0
+        else:
+            await ctx.send(f" {msg.author} aproved the match")
+            player.remove(msg.author.id)
+            if len(player) == 0:
+                await ctx.send("all player already approved the match")
+                return 1
+
+
+async def pick_multi(user, ctx, bot, deck):
+    player = [ctx.guild.get_member(i) for i in user]
+    dic = {}
+    while True:
+        def check(author, deck):
+            def inner_check(message):
+                if message.author not in author:
+                    return False
+                else:
+                    x = message.content
+                    if x in deck:
+                        return True
+                    else:
+                        return False
+            return inner_check
+        msg = await bot.wait_for('message', check=check(player, deck))
+        await ctx.send(f" {msg.author} picked {msg.content}")
+        dic[int(msg.content)] = msg.content.id
+        deck.remove(msg.content)
+        if len(deck) == 0:
+            await ctx.send("all player already decided their card")
+            return dic
+
+
 class Minigame_Event(commands.Cog):
     """ Next Minigame Event WIP """
 
@@ -182,76 +269,113 @@ class Minigame_Event(commands.Cog):
         await ctx.send("removed")
 
     @commands.command()
-    async def lucky7(self, ctx, arg):
+    async def destiny(self, ctx, *arg):
+        user = [ctx.message.author.id]
+        for i in range(arg-1):
+            user.append(int(arg[i][2:-1]))
+        for i in user:
+            try:
+                gac = gacha(i)
+                if gac.ticket < int(arg[-1]):
+                    await ctx.send(f"<@{i}> dont have enough ticket")
+                    return
+                gac.set_gacha(gac.ticket-int(arg[-1]))
+            except:
+                await ctx.send(f"<@{i}> isnt registered yet")
+        deck = [9]
+        for i in range(user-1):
+            deck.append(8)
+        await wait_player(user, ctx, self.bot)
+        bg = cv2.imread(CARD_PATH+"\\board.jpg", cv2.IMREAD_UNCHANGED)
+        bg = cv2.cvtColor(bg, cv2.COLOR_BGRA2BGR)
+        bg = put_text(arg[-1], bg)
+        await start_deck(bg, len(deck), ctx)
+        dic = await pick_multi(user, ctx, self.bot, deck)
+        random.shuffle(deck)
+        for i in range(len(deck)):
+            brd = card_slot(brd, card_list[deck[i]-1], card_pos(i))
+        cv2.imwrite("board.jpg", brd)
+        await ctx.send(file=discord.File("board.jpg"))
+        choice = deck.index(9)
+        did = dic[choice]
+        await ctx.send(f"congrats <@{did}> picked **D**estiny card, you won {int(arg-1)*len(deck)}")
+        gac = gacha(did)
+        gac.add_gacha(int(arg-1)*len(deck))
+
+    @commands.command()
+    async def gamble(self, ctx, arg):
         a = ctx.message.author.id
         set_up()
         try:
-            cid = check_disc(a)
+            check_disc(a)
         except:
             await ctx.send("you are not registered")
             return
-        char = character(cid)
-        if char.bounty < int(arg):
-            await ctx.send("you dont have enough bounty coin")
+        gac = gacha(a)
+        if gac.ticket < int(arg):
+            await ctx.send("you dont have enough ticket")
             return
         bg = cv2.imread(CARD_PATH+"\\board.jpg", cv2.IMREAD_UNCHANGED)
         bg = cv2.cvtColor(bg, cv2.COLOR_BGRA2BGR)
         board = put_text(arg, bg)
         brd = board.copy()
-        remain = 7
-        deck = [3, 4, 5, 6, 7, 8, 9]
-        while True:
-            brd = board.copy()
-            for i in range(remain):
-                brd = card_slot(brd, card_list[9], card_pos(i))
-            cv2.imwrite("board.jpg", brd)
-            await ctx.send(file=discord.File("board.jpg"))
-            await ctx.send(f"pick one 1-{remain}")
+        remain = 2
+        deck = [8, 9]
+        brd = await start_deck(brd, remain, ctx)
+        _, choice = await check_deck(deck, brd, ctx, self.bot)
+        if deck[choice] == 8:
+            await ctx.send(f"sorry you lose the game, you lose {arg} ticket you bet")
+            gac.set_gacha(gac.ticket-int(arg))
+        else:
+            await ctx.send(f"congrats you won the game, you win {int(arg)*2} ticket")
+            gac.add_gacha(int(arg)*2)
 
-            def check(author, remain):
-                def inner_check(message):
-                    if message.author != author:
-                        return False
-                    else:
-                        try:
-                            x = int(message.content)
-                            if 0 < x <= remain:
-                                return True
-                            else:
-                                return False
-                        except:
-                            return False
-                return inner_check
-            msg = await self.bot.wait_for('message', check=check(ctx.author, remain))
-            random.shuffle(deck)
-            choice = int(msg.content) - 1
-            brd = card_slot(brd, card_list[deck[choice]-1], card_pos(choice))
-            cv2.imwrite("board.jpg", brd)
-            await ctx.send(file=discord.File("board.jpg"))
+    @commands.command()
+    async def lucky7(self, ctx):
+        a = ctx.message.author.id
+        set_up()
+        try:
+            check_disc(a)
+        except:
+            await ctx.send("you are not registered")
+            return
+        gac = gacha(a)
+        if gac.ticket < 10:
+            await ctx.send("you dont have enough ticket")
+            return
+        bg = cv2.imread(CARD_PATH+"\\board.jpg", cv2.IMREAD_UNCHANGED)
+        bg = cv2.cvtColor(bg, cv2.COLOR_BGRA2BGR)
+        board = put_text("10", bg)
+        brd = board.copy()
+        remain = 9
+        deck = [i+1 for i in range(remain)]
+        while True:
+            brd = await start_deck(board, remain, ctx)
+            brd, choice = await check_deck(deck, brd, ctx, self.bot)
             if deck[choice] == 9:
                 remain -= 1
                 if remain == 2:
-                    await ctx.send("sorry you lose the game but you didnt lose coin since your insane luck to draw d card 7 times lol")
+                    await ctx.send("sorry you lose the game but you didnt lose ticket since your insane luck to draw d card 7 times lol")
                     brd = card_slot(brd, card_list[6], card_pos(deck.index(7)))
                     cv2.imwrite("board.jpg", brd)
                     await ctx.send(file=discord.File("board.jpg"))
                     break
                 deck.remove(9-remain)
-                await ctx.send(f"you got another try with {remain} card\nand you got {int(arg)} bounty coin as bonus for getting **D** card")
-                char.add_bounty(int(arg))
+                await ctx.send(f"you got another try with {remain} card\nand you got 10 ticket as bonus for getting **D**estiny card")
+                gac.add_gacha(10)
             elif deck[choice] == 8:
-                await ctx.send(f"you got another try with {remain} card\nand you got {int(arg)*2} bounty coin as bonus for getting **R** card")
-                char.add_bounty(int(arg)*2)
+                await ctx.send(f"you got another try with {remain} card\nand you got 5ticket as bonus for getting **R**etry card")
+                gac.add_gacha(5)
             elif deck[choice] == 7:
-                await ctx.send(f"congrats you won the game, you win {int(arg)*7} Bounty Coin")
-                char.add_bounty(int(arg)*7)
+                await ctx.send(f"congrats you won the game, you win 77 ticket")
+                gac.add_gacha(77)
                 break
             else:
-                await ctx.send(f"sorry you lose the game, you lose {arg} Bounty Coin")
+                await ctx.send(f"sorry you lose the game, you still gain {deck[choice]} ticket")
                 brd = card_slot(brd, card_list[6], card_pos(deck.index(7)))
                 cv2.imwrite("board.jpg", brd)
                 await ctx.send(file=discord.File("board.jpg"))
-                char.set_bounty(char.bounty-int(arg))
+                gac.set_gacha(gac.ticket-(10-deck[choice]))
                 break
 
     @commands.command()
