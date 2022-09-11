@@ -278,7 +278,7 @@ class MHFZ_User_Interactive(commands.Cog):
             gr = int(char.gr)
             if 200 <= gr < 500:
                 char.newbie_rw(arg)
-                await ctx.send("reward already discributed")
+                await ctx.send("reward already distributed")
             else:
                 await ctx.send("GR requirement not met")
 

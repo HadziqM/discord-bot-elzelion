@@ -1,6 +1,4 @@
 import random
-from secrets import choice
-from tracemalloc import start
 import discord
 import numpy as np
 from discord.ext import commands
@@ -171,8 +169,8 @@ async def purge(a, channel):
 
 async def start_deck(bg, remain, ctx):
     for i in range(remain):
-        brd = card_slot(brd, card_list[9], card_pos(i))
-    cv2.imwrite("board.jpg", brd)
+        bg = card_slot(bg, card_list[9], card_pos(i))
+    cv2.imwrite("board.jpg", bg)
     await ctx.send(file=discord.File("board.jpg"))
     await ctx.send(f"pick one 1-{remain}")
     return bg
@@ -224,22 +222,24 @@ async def wait_player(user, ctx, bot):
             return 0
         else:
             await ctx.send(f" {msg.author} aproved the match")
-            player.remove(msg.author.id)
-            if len(player) == 0:
+            user.remove(msg.author.id)
+            if len(user) == 0:
                 await ctx.send("all player already approved the match")
                 return 1
 
 
-async def pick_multi(user, ctx, bot, deck):
-    player = [ctx.guild.get_member(i) for i in user]
+async def pick_multi(object, ctx, bot, remain):
+    player = [ctx.guild.get_member(i) for i in object]
+    deck = [i+1 for i in range(remain)]
     dic = {}
     while True:
-        def check(author, deck):
+        def check(player, deck):
             def inner_check(message):
-                if message.author not in author:
+                print(message.author)
+                if message.author not in player:
                     return False
                 else:
-                    x = message.content
+                    x = int(message.content)
                     if x in deck:
                         return True
                     else:
@@ -247,8 +247,8 @@ async def pick_multi(user, ctx, bot, deck):
             return inner_check
         msg = await bot.wait_for('message', check=check(player, deck))
         await ctx.send(f" {msg.author} picked {msg.content}")
-        dic[int(msg.content)] = msg.content.id
-        deck.remove(msg.content)
+        dic[int(msg.content)] = msg.author.id
+        deck.remove(int(msg.content))
         if len(deck) == 0:
             await ctx.send("all player already decided their card")
             return dic
@@ -271,8 +271,9 @@ class Minigame_Event(commands.Cog):
     @commands.command()
     async def destiny(self, ctx, *arg):
         user = [ctx.message.author.id]
-        for i in range(arg-1):
+        for i in range(len(arg)-1):
             user.append(int(arg[i][2:-1]))
+        copycat = user.copy()
         for i in user:
             try:
                 gac = gacha(i)
@@ -282,25 +283,30 @@ class Minigame_Event(commands.Cog):
                 gac.set_gacha(gac.ticket-int(arg[-1]))
             except:
                 await ctx.send(f"<@{i}> isnt registered yet")
+                return
         deck = [9]
-        for i in range(user-1):
+        for i in range(len(user)-1):
             deck.append(8)
-        await wait_player(user, ctx, self.bot)
+        await ctx.send("all player reply with y/n so game can continue")
+        decision = await wait_player(user, ctx, self.bot)
+        if decision == 0:
+            return
         bg = cv2.imread(CARD_PATH+"\\board.jpg", cv2.IMREAD_UNCHANGED)
         bg = cv2.cvtColor(bg, cv2.COLOR_BGRA2BGR)
         bg = put_text(arg[-1], bg)
         await start_deck(bg, len(deck), ctx)
-        dic = await pick_multi(user, ctx, self.bot, deck)
+        print(copycat)
+        dic = await pick_multi(copycat, ctx, self.bot, len(deck))
         random.shuffle(deck)
         for i in range(len(deck)):
-            brd = card_slot(brd, card_list[deck[i]-1], card_pos(i))
+            brd = card_slot(bg, card_list[deck[i]-1], card_pos(i))
         cv2.imwrite("board.jpg", brd)
         await ctx.send(file=discord.File("board.jpg"))
-        choice = deck.index(9)
+        choice = deck.index(9)+1
         did = dic[choice]
-        await ctx.send(f"congrats <@{did}> picked **D**estiny card, you won {int(arg-1)*len(deck)}")
+        await ctx.send(f"congrats <@{did}> picked **D**estiny card, you won {int(arg[-1])*len(deck)}")
         gac = gacha(did)
-        gac.add_gacha(int(arg-1)*len(deck))
+        gac.add_gacha(int(arg[-1])*len(deck))
 
     @commands.command()
     async def gamble(self, ctx, arg):
@@ -343,13 +349,12 @@ class Minigame_Event(commands.Cog):
         if gac.ticket < 10:
             await ctx.send("you dont have enough ticket")
             return
-        bg = cv2.imread(CARD_PATH+"\\board.jpg", cv2.IMREAD_UNCHANGED)
-        bg = cv2.cvtColor(bg, cv2.COLOR_BGRA2BGR)
-        board = put_text("10", bg)
-        brd = board.copy()
         remain = 9
         deck = [i+1 for i in range(remain)]
         while True:
+            bg = cv2.imread(CARD_PATH+"\\board.jpg", cv2.IMREAD_UNCHANGED)
+            bg = cv2.cvtColor(bg, cv2.COLOR_BGRA2BGR)
+            board = put_text("10", bg)
             brd = await start_deck(board, remain, ctx)
             brd, choice = await check_deck(deck, brd, ctx, self.bot)
             if deck[choice] == 9:
