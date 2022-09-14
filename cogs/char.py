@@ -103,7 +103,10 @@ class MHFZ_User_Interactive(commands.Cog):
                 b[i] = "''"
         arg = ''.join(b)
         a = char_id(arg)
-        await ctx.send(a)
+        try:
+            await ctx.send(a)
+        except:
+            await ctx.send("that charachter name isnt exist on Rain server database\nmake sure that youare playing on rain server and input correct charachter name (not username)")
 
     @commands.command()
     async def card(self, ctx, arg):
@@ -215,6 +218,8 @@ class MHFZ_User_Interactive(commands.Cog):
         arg = check_disc(a)
         char = character(arg)
         mod = moderator()
+        if char.guild != 'No Guild':
+            return await ctx.send("youare already on guild")
         if mod.guild_mem(arg1) >= 60:
             await ctx.channel.send(f"Guild already overloaded")
             return
@@ -283,25 +288,30 @@ class MHFZ_User_Interactive(commands.Cog):
                 await ctx.send("GR requirement not met")
 
     @commands.command()
-    @commands.cooldown(1, 120, commands.BucketType.user)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def register(self, ctx, arg, arg1):
+        cd = int(dt.timestamp(dt.now())) + 60
         bot = self.bot
         a = ctx.message.author.id
         set_up()
-        char = character(arg)
+        try:
+            char = character(arg)
+        except:
+            await ctx.send(f"id not found, or invalid id being input\nwait for <t:{cd}:R> b4 you can use this command again")
+            return
         if char.discord != None:
-            await ctx.channel.send("character already owned")
+            await ctx.channel.send(f"character already owned\nwait for <t:{cd}:R> b4 you can use this command again")
             return
         try:
             b = check_disc(a)
-            await ctx.channel.send(f"you have own {b}")
+            await ctx.channel.send(f"you have own {b}\nwait for <t:{cd}:R> b4 you can use this command again")
             return
         except:
             None
         if arg1 == 'm' or arg1 == 'f':
             None
         else:
-            await ctx.channel.send("invalid gender")
+            await ctx.channel.send("invalid genderwait for <t:{cd}:R> b4 you can use this command again")
             return
         await ctx.channel.send('is this your charachter?\nReply with (y/n)\nwait a minute if embeded did not shown yet')
         await mcard(self.bot, ctx, arg)
@@ -314,7 +324,7 @@ class MHFZ_User_Interactive(commands.Cog):
                     if message.content == 'y' or message.content == 'Y' or message.content == 'n':
                         return True
             return inner_check
-        msg = await bot.wait_for('message', check=check(ctx.author), timeout=120)
+        msg = await bot.wait_for('message', check=check(ctx.author), timeout=60)
         if 'n' in msg.content.lower():
             return await ctx.send("aborted")
         role = get(ctx.message.guild.roles, id=1017643913667936318)
