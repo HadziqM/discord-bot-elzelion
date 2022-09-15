@@ -49,9 +49,51 @@ class Guide_Help(commands.Cog):
         embed.add_field(
             name='Info', value='bounty is our server main event, there are various bounty quest you can take with really generous reward', inline=False)
         embed.add_field(
-            name='Requirements', value='this feature only accessable for registered player, use *!rain register_guide* to see how to register', inline=False)
+            name='Requirements', value='you need to be registered on server', inline=False)
         embed.add_field(name='How to Participate', value='first you need to know our bounty rules that stated on <#962864233371021342>.\n you can see various quest you can take on <#962712664180654090>, pick one that suit you but please read the requirement carefully before deciding\n\ncheck if bounty is still availabe to take on <#1004686730479292447>.\nafter that just do the quest in game, after you successfully beat the main objectives, screensoot your equipment on quest completion then send it to <#940326599474163752>.\ndont forget to ping <@&937306936939020309> and state the bounty title you take\n\nafter that just let us judge your bonty, if its valid then bot will ping you about the reward.\n\nto see your reward just hop into game and talk to guide lady near enterance', inline=False)
         embed.add_field(name='Bounty Coin', value='beside ingame reward you also got bounty coin which is separated from game feature.\n\nbounty coin will be usefull for upcoming server event and you could also participate bounty leaderboard with it.\ndepending on your achievement you could get promoted and given title at <#1005816626425380944>.\n\nthe title will further boost your bounty coin gain depending on title you had', inline=False)
+        await ctx.channel.send(file=file, embed=embed)
+
+    @commands.command()
+    async def lucky7_guide(self, ctx):
+        embed = discord.Embed(title='Lucky7 Guide',
+                              color=discord.Color.green())
+        file = discord.File(
+            f'{MISC_PATH}\\Rain_Server.png', filename='serv.png')
+        embed.set_thumbnail(url='attachment://serv.png')
+        embed.add_field(
+            name='Info', value='in this minigame you need to guess card to play', inline=False)
+        embed.add_field(
+            name='Requirements', value='you need to have 10 gacha ticket to play', inline=False)
+        embed.add_field(name='How to Play', value='Use\n*!rain lucky7*\nto play the game\n\nFirst bot will shuffle card and put 9 flipped card at deck, pick one of the flipped card\n\n> If the card you pick is 7, congrats you win 77 ticket\n\n> If the card you pick is 1-6, you lose the game, but you got corresponding ticket, eg. Card with value 1 will give you 1 ticket, 2 for two ticket etc.\n\n> If the card you pick is special card R its a retry card, you got 5 gacha ticket and can retry the game for free\n\n> If the card you pick is special card D its destiny card, you got your 10 ticket back and you can retry the game for free, also deck number will be lowered by 1 by removing lowest number card, eg. First time pick **D** will remove 1 ftom deck, second time is 2, etc.', inline=False)
+        await ctx.channel.send(file=file, embed=embed)
+
+    @commands.command()
+    async def gamble_guide(self, ctx):
+        embed = discord.Embed(title='Gamble Guide',
+                              color=discord.Color.green())
+        file = discord.File(
+            f'{MISC_PATH}\\Rain_Server.png', filename='serv.png')
+        embed.set_thumbnail(url='attachment://serv.png')
+        embed.add_field(
+            name='Info', value='in this minigame you need to guess 2 card to play and got double amount of bet', inline=False)
+        embed.add_field(
+            name='Requirements', value='you need pay exact amount of gacha ticket you bet', inline=False)
+        embed.add_field(name='How to Play', value='You can bet any amount of gacha ticket, eg. \n*!rain gamble 100*\nto bet 100 ticket\n\nBot will suffle card and place 2 flipped card on board, pick one of the flipped card\n\n> if you pick D card, congrats you will get double amount of ticket you bet\n\n> if you pick R card, sorry you lose the ticket you bet', inline=False)
+        await ctx.channel.send(file=file, embed=embed)
+
+    @commands.command()
+    async def destiny_guide(self, ctx):
+        embed = discord.Embed(title='Destiny Guide',
+                              color=discord.Color.green())
+        file = discord.File(
+            f'{MISC_PATH}\\Rain_Server.png', filename='serv.png')
+        embed.set_thumbnail(url='attachment://serv.png')
+        embed.add_field(
+            name='Info', value='in this minigame you need to play with minimum of 2 poople and maximum of 10 poeple', inline=False)
+        embed.add_field(
+            name='Requirements', value='you need pay exact amount of gacha ticket you bet', inline=False)
+        embed.add_field(name='How to Play', value='You can challange minimum of one people and maximum of 9 (its 10 player max including challanger) and make sure all people have sufficient amount of ticket bet \neg.\n*!rain destiny @a @b 100*\nTo play with @a nad @b with 100 ticket bet\n\n(Pingging yourself didnt work, i know what youare thinking hehehe)\n\n> Bot will shuffle card and place flipped card on board, the amount of card is depending on player joined on game, pick one of the flipped card,\n\n> first come first serve, the one reply first got the choice taken first, if all player already pick the card available then its reveal time\n\n> if the card you pick is D card you are the winner amongs all player and you got all the ticket bet, eg. Play with 3 people will give you 3 times bet for the winner\n\n> if the card you pick is R, sorry you lose the ticket you bet', inline=False)
         await ctx.channel.send(file=file, embed=embed)
 
     @commands.command()

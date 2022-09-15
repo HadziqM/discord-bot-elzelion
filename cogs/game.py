@@ -272,6 +272,8 @@ class Minigame_Event(commands.Cog):
     async def destiny(self, ctx, *arg):
         user = [ctx.message.author.id]
         for i in range(len(arg)-1):
+            if int(arg[i][2:-1]) in user:
+                return await ctx.send("there is same people on the list, game aborted")
             user.append(int(arg[i][2:-1]))
         copycat = user.copy()
         for i in user:

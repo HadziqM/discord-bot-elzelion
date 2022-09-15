@@ -159,6 +159,33 @@ async def mpromote(ctx, state, user, chan, cid):
         return
 
 
+async def mannounce(bot, ch, a, arg, methode):
+    date = int(dt.timestamp(dt.now()))
+    embed = discord.Embed(title=arg[0], color=discord.Color.green())
+    file = discord.File(
+        f'{BOUNTY_PATH}\\{arg[0]}.png', filename='serv.png')
+    embed.set_thumbnail(url='attachment://serv.png')
+    embed.set_image(url=arg[1])
+    if methode == "solo":
+        user = await bot.fetch_user(int(a[0]))
+        embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+        embed.add_field(name=a[1], value=f'Cleared: Solo \n<t:{date}:F>')
+    if methode == "npc":
+        user = await bot.fetch_user(int(a[0]))
+        embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+        embed.add_field(
+            name=a[1], value=f'Cleared: Multiplayer With NPC \n<t:{date}:F>')
+    else:
+        embed.add_field(
+            name='TEAM', value=f'Cleared: Multiplayer \n<t:{date}:F>', inline=False)
+        length = len(a)
+        for i in range(length/2):
+            user = await bot.fetch_user(int(a[i]))
+            embed.add_field(
+                name=a[i+length], value=f'Discord: {user}', inline=False)
+    return await ch.send(file=file, embed=embed)
+
+
 class Bounty_Event(commands.Cog):
     """ Participate bounty to get generous reward """
 
@@ -178,11 +205,37 @@ class Bounty_Event(commands.Cog):
         await mbounty(chan)
 
     @commands.command()
+    async def claim(self, ctx, *arg):
+        async for message in ctx.channel.history(limit=1):
+            await message.delete()
+        bot = self.bot
+        ch = bot.get_channel(anc)
+        ch1 = bot.get_channel(cd)
+        set_up()
+        bon = bounty(arg[0])
+        if bon.cooldown == 0:
+            await ctx.send("cooldown")
+            return
+        if len(arg) <= 2:
+            await ctx.send('missing argument')
+        if len(arg) == 3:
+            did = int(arg[2][2:-1])
+            try:
+                cid = check_disc(did)
+            except:
+                await ctx.send(
+                    f'<@{did}> you need to register first to participate bounty')
+                return
+            char = character(cid)
+            confirm = await mannounce(bot, ch, [did, char.name], [arg[0], arg[1]], "solo")
+            await confirm.add_reaction("👍")
+            await confirm.add_reaction("👎")
+
+    @commands.command()
     @commands.has_role(mod_id)
     async def announce(self, ctx, *arg):
         async for message in ctx.channel.history(limit=1):
             await message.delete()
-        date = int(dt.timestamp(dt.now()))
         bot = self.bot
         ch = bot.get_channel(anc)
         ch1 = bot.get_channel(cd)
@@ -196,11 +249,6 @@ class Bounty_Event(commands.Cog):
             return
         if len(arg) <= 2:
             await ctx.send('missing argument')
-        embed = discord.Embed(title=arg[0], color=discord.Color.green())
-        file = discord.File(
-            f'{BOUNTY_PATH}\\{arg[0]}.png', filename='serv.png')
-        embed.set_thumbnail(url='attachment://serv.png')
-        embed.set_image(url=arg[1])
         if len(arg) == 3:
             did = int(arg[2][2:-1])
             try:
@@ -210,14 +258,12 @@ class Bounty_Event(commands.Cog):
                     f'<@{did}> you need to register first to participate bounty')
                 return
             a = bon.announce_now('solo', cid)
-            user = await bot.fetch_user(int(a[0]))
-            embed.set_author(name=user.display_name, icon_url=user.avatar_url)
-            embed.add_field(name=a[1], value=f'Cleared: Solo \n<t:{date}:F>')
             if a[-1] == 0:
                 await ctx.send(f"<@{user.id}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
             else:
                 await ctx.send(f"<@{user.id}> reward already distributed, claim it before bounty white day")
             await mpromote(ctx, a[-2], ctx.guild.get_member(int(a[0])), ch3, cid)
+            await mannounce(bot, ch, a, [arg[0], arg[1]], "solo")
         elif arg[3] == 'npc':
             did = int(arg[2][2:-1])
             try:
@@ -228,14 +274,12 @@ class Bounty_Event(commands.Cog):
                 return
             a = bon.announce_now('cat', cid)
             user = await bot.fetch_user(int(a[0]))
-            embed.set_author(name=user.display_name, icon_url=user.avatar_url)
-            embed.add_field(
-                name=a[1], value=f'Cleared: Multiplayer With NPC \n<t:{date}:F>')
             if a[-1] == 0:
                 await ctx.send(f"<@{user.id}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
             else:
                 await ctx.send(f"<@{user.id}> reward already distributed, claim it before bounty white day")
             await mpromote(ctx, a[-2], ctx.guild.get_member(int(a[0])), ch3, cid)
+            await mannounce(bot, ch, a, [arg[0], arg[1]], "npc")
         elif len(arg) >= 4:
             cid = []
             for i in range(len(arg)-2):
@@ -248,20 +292,16 @@ class Bounty_Event(commands.Cog):
                     return
                 cid.append(cidi)
             a, b, c, d = bon.announce_now('multi', cid)
-            embed.add_field(
-                name='TEAM', value=f'Cleared: Multiplayer \n<t:{date}:F>', inline=False)
             for i in range(len(cid)):
-                user = await bot.fetch_user(int(a[i]))
-                embed.add_field(
-                    name=b[i], value=f'Discord: {user}', inline=False)
+                a.append(b[i])
                 if c[i] == 0:
                     await ctx.send(f"<@{user.id}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
                 else:
                     await ctx.send(f"<@{user.id}> reward already distributed, claim it before bounty white day")
                 await mpromote(ctx, d[i], ctx.guild.get_member(int(a[i])), ch3, cid[i])
+            await mannounce(bot, ch, a, [arg[0], arg[1]], "multi")
         else:
             return
-        await ch.send(file=file, embed=embed)
         await mbounty(ch1)
         await mleaderboard(bot, ch2, ch4)
 
