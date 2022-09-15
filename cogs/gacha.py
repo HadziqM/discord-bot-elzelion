@@ -10,11 +10,13 @@ from discord.ext import commands
 main = database()
 mod_id = int(main.mod)
 
-UR = "Aphosis Pilar Clear Lv100 x1"
-SSR1 = ["Supreme Axe Francisca x1", "Divine Gelatine x1", "Divine Caduceus x1",
-        "Wicked Dainslef x1"]
-SSR2 = ["Divine Power Gem x25000", "Shiten Key x250"]
-SR1 = ["NP SnS Mat x100", "NP DS Mat x100", "NP Swaxe Mat x100"]
+UR = ["Divine Excalibur", "True Kusanagi-no-Tsurugi"]
+SSR1 = ["Flag of the Saint VI", "Fake Projection Spiral VII", "Nameless Dagger (Black)	VII", "Nameless Dagger	VII", "Ea: Black Diverged Sword VII", "Ea: Diverged Air Sword VII",
+        "Golden Victory Sword VII", "Kanshou and Bakuya VII", "Sword of Promised Victory VII", "6921 Fate Armor Set01", "221C Fate Armor Set02"]
+SSR2 = ["4339 Fate Armor Set03", "383A Fate Armor Set04",
+        "393A Fate Armor Set05", "9C2C Fate Armor Set06"]
+SR1 = ["Hiden Stamp Sns x5", "Hiden Stamp DS x5", "Hiden Stamp GS x5", "Hiden Stamp LS x5", "Hiden Stamp Hammer x5", "Hiden Stamp HH x5", "Hiden Stamp Lance x5",
+       "Hiden Stamp GL x5", "Hiden Stamp Swaxe x5", "Hiden Stamp Tonfa x5", "Hiden Stamp MS x5", "Hiden Stamp LBG x5", "Hiden Stamp HBG x5", "Hiden Stamp Bow x5"]
 SR2 = ["Divine Power Gem x200", "Shiten Tkt x100", "Upper Shiten key x10", "NP SnS Mat x50",
        "NP DS Mat x50", "NP Swaxe Mat x50"]
 SR3 = ["Divine Power Gem x150", "Shiten Tkt x50", "Shiten key x10"]
@@ -30,7 +32,7 @@ def rarity(gac):
     x = random.random()
     if x <= 0.001:
         gac.set_pity(0)
-        return UR, jpg("ur.jpg")
+        return random.choice(UR), jpg("ur.jpg")
     elif 0.05 >= x > 0.001:
         gac.set_pity(0)
         return SSR(random.random()), jpg("ssr.jpg")
