@@ -25,8 +25,8 @@ class DownLoad():
     def print(self, cid, dir):
         # a = input('input distribution id: \n')
         a = cid
-        self.cur.execute(self.sql % a)
-        print(self.cur.fetchone()[0])
+        # self.cur.execute(self.sql % a)
+        # print(self.cur.fetchone()[0])
         # b = input('input bounty name (just exit if description above is not your aim)\n')+'.bin'
         b = dir
         return self.get(b, a)
@@ -76,7 +76,3 @@ def interact():
         'input bounty name (just exit if description above is not your aim)\n')+'.bin'
     print(bbq(b, a, cur))
     print(f'check {b} in this folder')
-
-
-down = DownLoad()
-down.print()

@@ -9,9 +9,10 @@ from discord.ext import commands
 
 main = database()
 mod_id = int(main.mod)
+hertz = 455622761168109569
 
 UR = ["Divine Excalibur", "True Kusanagi-no-Tsurugi"]
-SSR1 = ["Flag of the Saint VI", "Fake Projection Spiral VII", "Nameless Dagger (Black)	VII", "Nameless Dagger	VII", "Ea: Black Diverged Sword VII", "Ea: Diverged Air Sword VII",
+SSR1 = ["Flag of the Saint VI", "Fake Projection Spiral VII", "Nameless Dagger(Black) VII", "Nameless Dagger VII", "Ea Black Diverged Sword VII", "Ea Diverged Air Sword VII",
         "Golden Victory Sword VII", "Kanshou and Bakuya VII", "Sword of Promised Victory VII", "6921 Fate Armor Set01", "221C Fate Armor Set02"]
 SSR2 = ["4339 Fate Armor Set03", "383A Fate Armor Set04",
         "393A Fate Armor Set05", "9C2C Fate Armor Set06"]
@@ -82,12 +83,15 @@ async def mtest(did, ctx, bot, arg):
     gac = gacha(did)
     destiny = gac.pull()
     char = character(arg)
-    if destiny == 1:
-        text, jpg = rarity(gac)
-    elif destiny == 2:
+    if int(did) == hertz:
         text, jpg = guaranted()
     else:
-        return await ctx.send("insufficient gacha ticket")
+        if destiny == 1:
+            text, jpg = rarity(gac)
+        elif destiny == 2:
+            text, jpg = guaranted()
+        else:
+            return await ctx.send("insufficient gacha ticket")
     gac.reward(arg, text)
     bg = cv2.imread(jpg, cv2.IMREAD_UNCHANGED)
     top = 518
