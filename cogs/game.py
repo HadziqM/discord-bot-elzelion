@@ -334,7 +334,7 @@ class Minigame_Event(commands.Cog):
             gac.set_gacha(gac.ticket-int(arg))
         else:
             await ctx.send(f"congrats you won the game, you win {int(arg)*2} ticket")
-            gac.add_gacha(int(arg)*2)
+            gac.add_gacha(int(arg))
 
     @commands.command()
     async def lucky7(self, ctx):
