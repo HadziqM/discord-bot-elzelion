@@ -137,6 +137,9 @@ class GeneralCog(commands.Cog):
         ch = self.bot.get_channel(1006812758647521310)
         print(error)
         await ch.send(error)
+        if isinstance(error, commands.CommandOnCooldown):
+            await ctx.send('This command is on a %.2fs cooldown' % error.retry_after)
+            raise error  # re-raise the error so all the errors will still show up in console
 
 
 def setup(bot):

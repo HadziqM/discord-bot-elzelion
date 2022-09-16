@@ -239,7 +239,10 @@ async def pick_multi(object, ctx, bot, remain):
                 if message.author not in player:
                     return False
                 else:
-                    x = int(message.content)
+                    try:
+                        x = int(message.content)
+                    except:
+                        return False
                     if x in deck:
                         return True
                     else:
@@ -269,6 +272,7 @@ class Minigame_Event(commands.Cog):
         await ctx.send("removed")
 
     @commands.command()
+    @commands.cooldown(1, 60, commands.BucketType.guild)
     async def destiny(self, ctx, *arg):
         user = [ctx.message.author.id]
         for i in range(len(arg)-1):
@@ -311,6 +315,7 @@ class Minigame_Event(commands.Cog):
         gac.add_gacha(int(arg[-1])*len(deck))
 
     @commands.command()
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def gamble(self, ctx, arg):
         a = ctx.message.author.id
         set_up()
@@ -329,6 +334,8 @@ class Minigame_Event(commands.Cog):
         brd = board.copy()
         remain = 2
         deck = [8, 9]
+        random.shuffle(deck)
+        random.shuffle(deck)
         brd = await start_deck(brd, remain, ctx)
         _, choice = await check_deck(deck, brd, ctx, self.bot)
         if deck[choice] == 8:
@@ -339,6 +346,7 @@ class Minigame_Event(commands.Cog):
             gac.add_gacha(int(arg))
 
     @commands.command()
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def lucky7(self, ctx):
         a = ctx.message.author.id
         set_up()
