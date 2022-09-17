@@ -335,5 +335,5 @@ class MHFZ_User_Interactive(commands.Cog):
         await ctx.channel.send('now you are registered\nand congrats you also got got free 10 try on gacha')
 
 
-def setup(bot):
-    bot.add_cog(MHFZ_User_Interactive(bot))
+async def setup(bot):
+    await bot.add_cog(MHFZ_User_Interactive(bot))

@@ -142,5 +142,5 @@ class GeneralCog(commands.Cog):
             raise error  # re-raise the error so all the errors will still show up in console
 
 
-def setup(bot):
-    bot.add_cog(GeneralCog(bot))
+async def setup(bot):
+    await bot.add_cog(GeneralCog(bot))

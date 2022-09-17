@@ -195,5 +195,5 @@ class Gacha_Event(commands.Cog):
             await ctx.send(f"successfully bought {str(arg)} ticket ")
 
 
-def setup(bot):
-    bot.add_cog(Gacha_Event(bot))
+async def setup(bot):
+    await bot.add_cog(Gacha_Event(bot))

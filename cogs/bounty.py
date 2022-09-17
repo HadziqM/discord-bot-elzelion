@@ -332,5 +332,5 @@ class Bounty_Event(commands.Cog):
         await mbounty(chan)
 
 
-def setup(bot):
-    bot.add_cog(Bounty_Event(bot))
+async def setup(bot):
+    await bot.add_cog(Bounty_Event(bot))

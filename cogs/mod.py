@@ -288,5 +288,5 @@ class Mod_Only_Command(commands.Cog):
             await ctx.send(f"cant send reward, check your spelling")
 
 
-def setup(bot):
-    bot.add_cog(Mod_Only_Command(bot))
+async def setup(bot):
+    await bot.add_cog(Mod_Only_Command(bot))

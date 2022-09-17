@@ -197,5 +197,5 @@ The Event quests for GRP Gain were moved to the end of G rank progression since 
         await ctx.channel.send(notes)
 
 
-def setup(bot):
-    bot.add_cog(Guide_Help(bot))
+async def setup(bot):
+    await bot.add_cog(Guide_Help(bot))

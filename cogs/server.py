@@ -52,5 +52,5 @@ class Server_Exclusive_Command(commands.Cog):
         await ctx.channel.send(oke[0])
 
 
-def setup(bot):
-    bot.add_cog(Server_Exclusive_Command(bot))
+async def setup(bot):
+    await bot.add_cog(Server_Exclusive_Command(bot))

@@ -447,5 +447,5 @@ class Minigame_Event(commands.Cog):
         await purge(200, channel2)
 
 
-def setup(bot):
-    bot.add_cog(Minigame_Event(bot))
+async def setup(bot):
+    await bot.add_cog(Minigame_Event(bot))

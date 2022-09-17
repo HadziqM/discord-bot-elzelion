@@ -200,5 +200,5 @@ class GameCog(commands.Cog):
             await channel2.send(f'{prin(draw(deck2,2))}\n HP = {hp2}')
 
 
-def setup(bot):
-    bot.add_cog(GameCog(bot))
+async def setup(bot):
+    await bot.add_cog(GameCog(bot))
