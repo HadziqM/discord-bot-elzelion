@@ -107,7 +107,7 @@ async def mtest(did, ctx, bot, arg):
     x = int((wid - size[0])/2 + left)
     y = int((hei + size[1])/2 + top)
     cv2.putText(bg, text, (x, y), font, 1, (255, 255, 255), 1)
-    url = str(user.avatar_url)
+    url = str(user.avatar)
     http = urllib3.PoolManager()
     req = http.request('GET', url, preload_content=False)
     req.release_conn()
@@ -146,7 +146,7 @@ async def mevent(ctx, did, bot):
     gac = gacha(did)
     embed = discord.Embed(title="My Event Status",
                           description=f'Bounty Coin : {gac.bounty}\nGacha Ticket : {gac.ticket}\nPity Count : {gac.pity}', color=discord.Color.red())
-    embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+    embed.set_author(name=user.display_name, icon_url=user.avatar)
     await ctx.channel.send(content=None, embed=embed)
 
 

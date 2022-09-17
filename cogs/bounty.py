@@ -33,7 +33,7 @@ async def mtest(chan, user, cid, state):
     d = 160
     botom = top1+d
     rg = left1+d
-    url = str(user.avatar_url)
+    url = str(user.avatar)
     http = urllib3.PoolManager()
     req = http.request('GET', url, preload_content=False)
     req.release_conn()
@@ -63,7 +63,7 @@ async def mtest(chan, user, cid, state):
     embed = discord.Embed(
         title='Congratulation on Promotion', color=discord.Color.green())
     file = discord.File(f'{TITLE_PATH}\\oke.png', filename='prom.png')
-    embed.set_thumbnail(url=user.avatar_url)
+    embed.set_thumbnail(url=user.avatar)
     embed.set_image(url='attachment://prom.png')
     char = character(cid)
     set_up()
@@ -109,7 +109,7 @@ async def mleaderboard(bot, chan, chan1):
     embed = discord.Embed(title='BOUNTY LEADERBOARD',
                           color=discord.Color.blue())
     file = discord.File(f'{MISC_PATH}\\Rain_Server.png', filename='serv.png')
-    embed.set_thumbnail(url=aser.avatar_url)
+    embed.set_thumbnail(url=aser.avatar)
     embed.set_author(name="Rain Server", icon_url='attachment://serv.png')
     g = int(len(c))
     backup = '```'
@@ -168,11 +168,11 @@ async def mannounce(bot, ch, a, arg, methode):
     embed.set_image(url=arg[1])
     if methode == "solo":
         user = await bot.fetch_user(int(a[0]))
-        embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+        embed.set_author(name=user.display_name, icon_url=user.avatar)
         embed.add_field(name=a[1], value=f'Cleared: Solo \n<t:{date}:F>')
     if methode == "npc":
         user = await bot.fetch_user(int(a[0]))
-        embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+        embed.set_author(name=user.display_name, icon_url=user.avatar)
         embed.add_field(
             name=a[1], value=f'Cleared: Multiplayer With NPC \n<t:{date}:F>')
     else:

@@ -104,7 +104,7 @@ class GeneralCog(commands.Cog):
         ch = self.bot.get_channel(937230168223789068)
         embed = discord.Embed(title='New Member Joined',
                               description=f'Welcome Hunter <@{member.id}> to Rain Server!', color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.avatar)
         embed.set_image(url='https://images-ext-1.discordapp.net/external/y2SXBjVyNZtx2Gl4JQAOQS1kwJtO5gqonPIDjmJuxMg/https/1.bp.blogspot.com/-yVYtMyRqaAs/Xl-n-TDOlDI/AAAAAAAz79I/-I4BXPabFHAUMSYwlLro4XsZgI01gupsgCLcBGAsYHQ/s1600/AW4185658_11.gif')
         embed.add_field(name='First Thing First',
                         value='Please be sure to read and follow our <#944826144727904256>.\nPick your <#950728487319257099> for general identity.', inline=False)
@@ -120,7 +120,7 @@ class GeneralCog(commands.Cog):
         joined = int(dt.timestamp(member.joined_at))
         embed = discord.Embed(title='Member Leave',
                               description=f'{member}', color=discord.Color.green())
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.avatar)
         embed.add_field(name='joined since',
                         value=f"<t:{joined}:R>", inline=False)
         a = str(member.roles)

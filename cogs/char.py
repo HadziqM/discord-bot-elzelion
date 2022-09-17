@@ -1,5 +1,5 @@
 import discord
-import random
+from discord import app_commands
 from datetime import datetime as dt
 from discord.ext import commands
 from discord.utils import get
@@ -29,7 +29,7 @@ async def mcard(bot, ctx, arg):
     embed = discord.Embed(title=a, color=discord.Color.blue())
     if char.discord != None:
         user = await bot.fetch_user(int(char.discord))
-        embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+        embed.set_author(name=user.display_name, icon_url=user.avatar)
     else:
         None
     file = discord.File(icon[char.weapon], filename='wep.png')
@@ -57,7 +57,7 @@ async def mcur(bot, ctx, arg):
                           description=f'Bounty Coin : {g}\nGCPoint : {a}\nPremium coin : {b}\ntrial coin : {c}\nnetcafe point : {d}\nfrontier point : {e}\nkouryou point : {f}', color=discord.Color.red())
     if char.discord != None:
         user = await bot.fetch_user(int(char.discord))
-        embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+        embed.set_author(name=user.display_name, icon_url=user.avatar)
     else:
         None
     await ctx.channel.send(content=None, embed=embed)
@@ -80,7 +80,7 @@ async def mboost(bot, ctx, arg):
                           color=discord.Color.blue())
     if char.discord != None:
         user = await bot.fetch_user(int(char.discord))
-        embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+        embed.set_author(name=user.display_name, icon_url=user.avatar)
     else:
         None
     for i in range(len(b)):
@@ -93,6 +93,10 @@ class MHFZ_User_Interactive(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    @app_commands.command(name="test")
+    async def testing(self, interaction: discord.Interaction):
+        await interaction.response.send_message("tested")
 
     @commands.command()
     async def id(self, ctx, arg):

@@ -9,7 +9,6 @@ intents = discord.Intents.all()
 intents.members = True
 intents.presences = True
 intents.messages = True
-
 menu = DefaultMenu(page_left="◀️", page_right="▶️", remove="❌")
 bot = commands.Bot(command_prefix=db.command,
                    intents=intents, help_command=PrettyHelp(color=discord.Colour.teal(), menu=menu))
