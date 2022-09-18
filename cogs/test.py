@@ -15,6 +15,9 @@ class GeneralCog(commands.Cog):
             print(f'run on {i.id} (name: {i.name})')
             a += 1
         print(f'elzelion in {a} guilds')
+        guild = discord.Object(937230168223789066)
+        self.bot.tree.copy_global_to(guild=guild)
+        await self.bot.tree.sync(guild=guild)
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Hunter's Despair"))
 
     @commands.Cog.listener()

@@ -1,5 +1,7 @@
 import discord
+import asyncio
 from discord import app_commands
+from discord.ui import View, Button
 from datetime import datetime as dt
 from discord.ext import commands
 from discord.utils import get
@@ -40,7 +42,7 @@ async def mcard(bot, ctx, arg):
         name='Character', value=f'Gender : {f}\nHunter Rank : {g}\nGold Rank : {h}', inline=False)
     embed.add_field(
         name='Guild', value=f'Name : {d}\nGuild ID : {e}', inline=False)
-    await ctx.channel.send(file=file, embed=embed)
+    return await ctx.channel.send(file=file, embed=embed)
 
 
 async def mcur(bot, ctx, arg):
@@ -88,29 +90,127 @@ async def mboost(bot, ctx, arg):
     await ctx.channel.send(content=None, embed=embed)
 
 
+class My2View(View):
+    def __init__(self, ctx, bot, listed):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.bot = bot
+        self.damn = listed
+        self.i = 0
+        self.msg = None
+
+    @discord.ui.button(label=f"See Account", style=discord.ButtonStyle.grey)
+    async def malebutton(self, interaction, button):
+        button.label = f"see {self.damn[self.i]}"
+        if self.msg:
+            await self.msg.delete()
+        self.msg = await mcard(self.bot, self.ctx, self.damn[self.i])
+        self.i += 1
+        if self.i == len(self.damn):
+            self.i = 0
+        button1 = [x for x in self.children if x.custom_id == "acc"][0]
+        button1.disabled = False
+        await interaction.response.edit_message(view=self)
+
+    @discord.ui.button(label="Use This Account", style=discord.ButtonStyle.green, disabled=True, custom_id="acc")
+    async def femalebutton(self, interaction, button):
+        await interaction.response.edit_message(view=self)
+        self.value = "y"
+        self.stop()
+
+    async def interaction_check(self, interaction) -> bool:
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message("this button isn't for you")
+            return False
+        else:
+            return True
+
+    async def on_timeout(self) -> None:
+        await self.ctx.send("Timeout")
+
+
+class MyView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+
+    @discord.ui.button(label="Register as Male", style=discord.ButtonStyle.green)
+    async def malebutton(self, interaction, button):
+        await interaction.response.edit_message(view=self)
+        self.value = "m"
+        self.stop()
+
+    @discord.ui.button(label="Register as Female", style=discord.ButtonStyle.blurple)
+    async def femalebutton(self, interaction, button):
+        button.disabled = True
+        await interaction.response.edit_message(view=self)
+        self.value = "f"
+        self.stop()
+
+    @discord.ui.button(label="do nothing", style=discord.ButtonStyle.red)
+    async def nobutton(self, interaction, button):
+        await interaction.response.edit_message(view=self)
+        await interaction.followup.send("understanable, Have a nice day!")
+        self.value = None
+        self.stop()
+
+    async def interaction_check(self, interaction) -> bool:
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message("this button isn't for you")
+            return False
+        else:
+            return True
+
+    async def on_timeout(self) -> None:
+        await self.ctx.send("Timeout")
+
+
 class MHFZ_User_Interactive(commands.Cog):
     """ all the command needed to connect to your Mhfz game """
 
     def __init__(self, bot):
+        bot.tree.on_error = self.on_app_command_error
         self.bot = bot
 
-    @app_commands.command(name="test")
-    async def testing(self, interaction: discord.Interaction):
-        await interaction.response.send_message("tested")
+    async def on_app_command_error(self, interaction, error):
+        print(error)
 
-    @commands.command()
-    async def id(self, ctx, arg):
+    @commands.hybrid_command(name="id")
+    async def id(self, ctx: commands.Context, in_game_name: str):
         set_up()
-        b = [i for i in arg]
+        b = [i for i in in_game_name]
         for i in range(len(b)):
             if b[i] == "'":
                 b[i] = "''"
         arg = ''.join(b)
         a = char_id(arg)
-        try:
-            await ctx.send(a)
-        except:
+        view = MyView(ctx)
+        if a == None:
             await ctx.send("that charachter name isnt exist on Rain server database\nmake sure that youare playing on rain server and input correct charachter name (not username)")
+        elif isinstance(a, int):
+            await mcard(self.bot, ctx, a)
+            msg = await ctx.send(view=view)
+            await view.wait()
+            if view.value == "m":
+                await ctx.send("male")
+            elif view.value == "f":
+                await ctx.send("femmale")
+            await msg.delete()
+        else:
+            view2 = My2View(ctx, self.bot, a)
+            length = len(a)
+            await ctx.send(f'there is {length} character with same name')
+            msg = await ctx.send(view=view2)
+            await view2.wait()
+            if view2.value == "y":
+                await msg.delete()
+                msg2 = await ctx.send(view=view)
+                await view.wait()
+                if view.value == "m":
+                    await ctx.send("male")
+                elif view.value == "f":
+                    await ctx.send("femmale")
+                await msg2.delete()
 
     @commands.command()
     async def card(self, ctx, arg):
@@ -301,15 +401,15 @@ class MHFZ_User_Interactive(commands.Cog):
         try:
             char = character(arg)
         except:
-            await ctx.send(f"id not found, or invalid id being input\nwait for <t:{cd}:R> b4 you can use this command again")
-            return
+            return await ctx.send(f"id not found, or invalid id being input\nwait for <t:{cd}:R> b4 you can use this command again")
+
         if char.discord != None:
-            await ctx.channel.send(f"character already owned\nwait for <t:{cd}:R> b4 you can use this command again")
-            return
+            return await ctx.channel.send(f"character already owned\nwait for <t:{cd}:R> b4 you can use this command again")
+
         try:
             b = check_disc(a)
-            await ctx.channel.send(f"you have own {b}\nwait for <t:{cd}:R> b4 you can use this command again")
-            return
+            return await ctx.channel.send(f"you have own {b}\nwait for <t:{cd}:R> b4 you can use this command again")
+
         except:
             None
         if arg1 == 'm' or arg1 == 'f':
@@ -317,26 +417,31 @@ class MHFZ_User_Interactive(commands.Cog):
         else:
             await ctx.channel.send("invalid genderwait for <t:{cd}:R> b4 you can use this command again")
             return
-        await ctx.channel.send('is this your charachter?\nReply with (y/n)\nwait a minute if embeded did not shown yet')
         await mcard(self.bot, ctx, arg)
+        button1 = Button(label="Yes!", style=discord.ButtonStyle.green)
+        button2 = Button(label="Nope!", style=discord.ButtonStyle.red)
+        view = View()
+        view.add_item(button1)
+        view.add_item(button2)
 
-        def check(author):
-            def inner_check(message):
-                if message.author != author:
-                    return False
-                else:
-                    if message.content == 'y' or message.content == 'Y' or message.content == 'n':
-                        return True
-            return inner_check
-        msg = await bot.wait_for('message', check=check(ctx.author), timeout=60)
-        if 'n' in msg.content.lower():
-            return await ctx.send("aborted")
+        async def button1_callback(interaction):
+            await self.mytest(ctx, a, arg, arg1)
+
+        async def button2_callback(interaction):
+            await interaction.response.send_message("understanable have a nice day!")
+
+        button1.callback = button1_callback
+        button2.callback = button2_callback
+        await ctx.send(view=view)
+
+    async def mytest(self, ctx, sub, arg, arg1):
         role = get(ctx.message.guild.roles, id=1017643913667936318)
         await ctx.author.add_roles(role)
-        char.add_data(a, arg1)
-        gac = gacha(a)
+        char = character(arg)
+        char.add_data(sub, arg1)
+        gac = gacha(sub)
         gac.add_gacha(100)
-        await ctx.channel.send('now you are registered\nand congrats you also got got free 10 try on gacha')
+        return await ctx.channel.send('now you are registered\nand congrats you also got got free 10 try on gacha')
 
 
 async def setup(bot):
