@@ -1,8 +1,11 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 from data import *
 from pretty_help import PrettyHelp, DefaultMenu
 import asyncio
+from base import *
+from cogs.ctxmenu import *
 
 db = database()
 intents = discord.Intents.all()
@@ -23,13 +26,12 @@ async def main():
     print('confirming token')
     await bot.start(db.token)
 
+
+@bot.tree.context_menu(name="mycard", guild=discord.Object(937230168223789066))
+async def mycard(interaction: discord.Interaction, member: discord.Member):
+    await mcard(member, interaction)
+
+
 if __name__ == '__main__':
     asyncio.run(main())
-
-# app = Quart(__name__)
-
-# @app.route("/")
-# async def index():
-#     return await render_template('index.html')
-
-# bot.loop.create_task(app.run_task('127.0.0.1'))
+    discord.utils.setup_logging()
