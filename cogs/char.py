@@ -121,7 +121,7 @@ class My2View(View):
 
     async def interaction_check(self, interaction) -> bool:
         if interaction.user != self.ctx.author:
-            await interaction.response.send_message("this button isn't for you")
+            await interaction.response.send_message("this button isn't for you", ephemeral=True)
             return False
         else:
             return True
@@ -165,13 +165,13 @@ class MyCardView(View):
     @discord.ui.button(label="do nothing", style=discord.ButtonStyle.red)
     async def nobutton(self, interaction, button):
         await interaction.response.edit_message(view=self)
-        await interaction.followup.send("understanable, Have a nice day!")
+        await interaction.followup.send("understanable, Have a nice day!", ephemeral=True)
         self.value = None
         self.stop()
 
     async def interaction_check(self, interaction) -> bool:
         if interaction.user != self.ctx.author:
-            await interaction.response.send_message("this button isn't for you")
+            await interaction.response.send_message("this button isn't for you", ephemeral=True)
             return False
         else:
             return True
@@ -202,13 +202,13 @@ class MyView(View):
     @discord.ui.button(label="do nothing", style=discord.ButtonStyle.red)
     async def nobutton(self, interaction, button):
         await interaction.response.edit_message(view=self)
-        await interaction.followup.send("understanable, Have a nice day!")
+        await interaction.followup.send("understanable, Have a nice day!", ephemeral=True)
         self.value = None
         self.stop()
 
     async def interaction_check(self, interaction) -> bool:
         if interaction.user != self.ctx.author:
-            await interaction.response.send_message("this button isn't for you")
+            await interaction.response.send_message("this button isn't for you", ephemeral=True)
             return False
         else:
             return True

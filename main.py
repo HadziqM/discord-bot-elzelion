@@ -20,16 +20,21 @@ print('start')
 
 async def main():
     extension = ['cogs.char', 'cogs.guide', 'cogs.gacha', 'cogs.game',
-                 'cogs.server', 'cogs.bounty', 'cogs.mod', 'cogs.test']
+                 'cogs.server', 'cogs.bounty_cog', 'cogs.mod', 'cogs.test']
     for i in extension:
         await bot.load_extension(i)
     print('confirming token')
     await bot.start(db.token)
 
 
-@bot.tree.context_menu(name="mycard", guild=discord.Object(937230168223789066))
+@bot.tree.context_menu(name="card", guild=discord.Object(937230168223789066))
 async def mycard(interaction: discord.Interaction, member: discord.Member):
     await mcard(member, interaction)
+
+
+@bot.tree.context_menu(name="event", guild=discord.Object(937230168223789066))
+async def mycard(interaction: discord.Interaction, member: discord.Member):
+    await mevent(member, interaction)
 
 
 if __name__ == '__main__':

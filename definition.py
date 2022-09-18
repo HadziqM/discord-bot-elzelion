@@ -14,5 +14,6 @@ TITLE_PATH = os.path.join(ROOT_DIR, 'title')
 GACHA_PATH = os.path.join(ROOT_DIR, 'gacha')
 GR_PATH = os.path.join(ROOT_DIR, 'gacha_r')
 CARD_PATH = os.path.join(ROOT_DIR, 'card')
+QUERY_PATH = os.path.join(ROOT_DIR, 'query')
 
 sys.path.insert(0, COG_PATH)

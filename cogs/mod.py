@@ -1,10 +1,11 @@
+import imp
 import discord
 import random
 from discord.ext import commands
 from discord.utils import get
 from direc import *
 from base import *
-
+from bounty_cog import mbounty, cd
 main = database()
 mod_id = int(main.mod)
 
@@ -286,6 +287,17 @@ class Mod_Only_Command(commands.Cog):
             await ctx.send(f"sended newbie reward to {char.name}")
         except:
             await ctx.send(f"cant send reward, check your spelling")
+
+        @commands.hybrid_command(name="sunday_routine", description="refresh bounty cd and distribution reward")
+        @commands.has_role(mod_id)
+        async def sunday(self, ctx):
+            ch = self.bot.get_channel(cd)
+            set_up()
+            mod = moderator()
+            mod.bounty_refresh()
+            mod.del_dist()
+            await mbounty(ch)
+            ctx.send("bounty refreshed and whipe up distribution reward")
 
 
 async def setup(bot):

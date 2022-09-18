@@ -38,3 +38,14 @@ async def mcard(member, interact):
     embed.add_field(
         name='Guild', value=f'Name : {d}\nGuild ID : {e}', inline=False)
     return await interact.response.send_message(file=file, embed=embed)
+
+
+async def mevent(member, interact):
+    user = member
+    gac = gacha(member.id)
+    mod = moderator()
+    rank = mod.disc_all().index(str(member.id))+1
+    embed = discord.Embed(title="My Event Status",
+                          description=f'Bounty Coin : {gac.bounty}\nGacha Ticket : {gac.ticket}\nPity Count : {gac.pity}\nLatest Bounty : {gac.bbq}\nTime Cleared : <t:{gac.bbq_time}:R>\nBounty Rank : {rank}', color=discord.Color.red())
+    embed.set_author(name=user.display_name, icon_url=user.avatar)
+    await interact.response.send_message(content=None, embed=embed)

@@ -1,3 +1,4 @@
+from asyncore import read
 from data import *
 
 
@@ -426,6 +427,10 @@ class character:
 
 
 class moderator:
+    def bounty_refresh(self):
+        a = open(f"{QUERY_PATH}\\bounty_refresh.sql","r").read()
+        cur.execute(a)
+
     def leader_id(self, gid):
         sql = '''SELECT leader_id FROM public.guilds WHERE id=%s '''
         cur.execute(sql % gid)
@@ -669,14 +674,12 @@ class bounty:
 
     def announce_now(self, state, cid):
         if state == 'solo':
-            self.cooldown_now()
             self.solo_point_now(cid)
             d = self.promote(cid)
             c = self.bounty_rw(cid, 'S')
             a = [self.discord, self.name, d, c]
             return a
         elif state == 'multi':
-            self.cooldown_now()
             b = []
             c = []
             d = []
@@ -691,7 +694,6 @@ class bounty:
                 e.append(g)
             return b, c, d, e
         elif state == 'cat':
-            self.cooldown_now()
             c = self.bounty_rw(cid, 'M')
             self.multi_point_now(cid)
             d = self.promote(cid)
@@ -715,7 +717,23 @@ class gacha:
         sql = f'''select bounty from discord where discord_id= '{did}' '''
         cur.execute(sql)
         self.bounty = cur.fetchone()[0]
+        sql = f'''SELECT latest_bounty_time FROM discord where discord_id = '{did}' '''
+        cur.execute(sql)
+        self.bbq_time = cur.fetchone()[0]
+        sql = f'''select latest_bounty from discord where discord_id= '{did}' '''
+        cur.execute(sql)
+        self.bbq = cur.fetchone()[0]
         self.did = did
+
+    def set_bbq(self, value):
+        self.bbq = value
+        sql = f''' UPDATE discord SET latest_bounty='{value}' WHERE discord_id='{self.did}' '''
+        cur.execute(sql)
+
+    def set_bbq_time(self, value):
+        self.bbq_time = value
+        sql = f''' UPDATE discord SET latest_bounty_time={value} WHERE discord_id='{self.did}' '''
+        cur.execute(sql)
 
     def guaranted(self):
         self.pity += 1
