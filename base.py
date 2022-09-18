@@ -277,6 +277,7 @@ class character:
         a = ['savedata', 'decomyset', 'partner', 'hunternavi', 'otomoairou', 'platebox',
              'platedata', 'platemyset', 'rengokudata', 'savemercenary', 'skin_hist']
         b = [f'{SAVE_PATH}\\', f'_{self.cid}.bin']
+        c = []
         for i in a:
             sql = '''SELECT %s FROM characters WHERE id= %s '''
             cur.execute(sql % (i, self.cid))
@@ -284,10 +285,12 @@ class character:
             if data == None:
                 a.remove(i)
             else:
-                wr = open(b[0]+i+b[1], 'wb')
+                fname = b[0]+i+b[1]
+                wr = open(fname, 'wb')
                 wr.write(data)
                 wr.close()
-        return [(b[0]+a[i]+b[1]) for i in range(len(a))]
+                c.append(fname)
+        return c
 
     def upload_save(self):
         hexa = open(f'{UPLOAD_PATH}\\savedata_{self.cid}.bin',

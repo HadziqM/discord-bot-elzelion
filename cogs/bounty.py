@@ -7,6 +7,7 @@ from discord.utils import get
 from datetime import datetime as dt
 from direc import *
 from base import *
+from discord.ui import View
 
 main = database()
 anc = int(main.announce)
@@ -63,7 +64,6 @@ async def mtest(chan, user, cid, state):
     embed = discord.Embed(
         title='Congratulation on Promotion', color=discord.Color.green())
     file = discord.File(f'{TITLE_PATH}\\oke.png', filename='prom.png')
-    embed.set_thumbnail(url=user.avatar)
     embed.set_image(url='attachment://prom.png')
     char = character(cid)
     set_up()
@@ -145,7 +145,7 @@ async def mpromote(ctx, state, user, chan, cid):
         await mtest(chan, user, cid, 3)
     elif state == 3:
         await user.add_roles(champion)
-        await chan.send(f"congratulation <@{user.id}> you are promoted to **Bounty Master** for reaching 200k bounty point")
+        await chan.send(f"congratulation <@{user.id}> you are promoted to **Bounty Champion** for reaching 200k bounty point")
         await mtest(chan, user, cid, 2)
     elif state == 4:
         await user.add_roles(road)
@@ -170,7 +170,7 @@ async def mannounce(bot, ch, a, arg, methode):
         user = await bot.fetch_user(int(a[0]))
         embed.set_author(name=user.display_name, icon_url=user.avatar)
         embed.add_field(name=a[1], value=f'Cleared: Solo \n<t:{date}:F>')
-    if methode == "npc":
+    elif methode == "npc":
         user = await bot.fetch_user(int(a[0]))
         embed.set_author(name=user.display_name, icon_url=user.avatar)
         embed.add_field(
@@ -179,11 +179,31 @@ async def mannounce(bot, ch, a, arg, methode):
         embed.add_field(
             name='TEAM', value=f'Cleared: Multiplayer \n<t:{date}:F>', inline=False)
         length = len(a)
-        for i in range(length/2):
+        for i in range(int(length/2)):
             user = await bot.fetch_user(int(a[i]))
             embed.add_field(
                 name=a[i+length], value=f'Discord: {user}', inline=False)
     return await ch.send(file=file, embed=embed)
+
+
+class MyView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=None)
+        self.ctx = ctx
+        self.value = None
+
+    @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
+    async def malebutton(self, interaction, button):
+        await interaction.response.edit_message(view=self)
+        self.value = "y"
+        self.stop()
+
+    @discord.ui.button(label="Not Approve", style=discord.ButtonStyle.red)
+    async def femalebutton(self, interaction, button):
+        button.disabled = True
+        await interaction.response.edit_message(view=self)
+        self.value = "n"
+        self.stop()
 
 
 class Bounty_Event(commands.Cog):
@@ -193,49 +213,160 @@ class Bounty_Event(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @commands.has_role(mod_id)
-    async def test(self, ctx):
-        set_up()
-        char = character('843')
-        await ctx.send(char.title)
-
-    @commands.command()
     async def bounty_list(self, ctx):
         chan = ctx.channel
         await mbounty(chan)
 
     @commands.command()
-    async def claim(self, ctx, *arg):
-        async for message in ctx.channel.history(limit=1):
-            await message.delete()
+    async def test(self, ctx):
+        ch = self.bot.get_channel(anc)
+        set_up()
+        char = character(check_disc(ctx.author.id))
+        await mannounce(self.bot, ch, [ctx.author.id, char.name], ["BBQ03", "https://cdn.discordapp.com/attachments/940326599474163752/1020921647944962079/Untitled6.png"], "solo")
+
+    @commands.hybrid_command(name="submit_solo", description="submit your bounty application to admin")
+    async def submit_solo(self, ctx: commands.Context, bbq: str, picture: str):
         bot = self.bot
-        ch = bot.get_channel(anc)
+        ch = bot.get_channel(1020947766203129876)
         ch1 = bot.get_channel(cd)
         set_up()
-        bon = bounty(arg[0])
+        bon = bounty(bbq)
         if bon.cooldown == 0:
             await ctx.send("cooldown")
             return
-        if len(arg) <= 2:
-            await ctx.send('missing argument')
-        if len(arg) == 3:
-            did = int(arg[2][2:-1])
+        did = ctx.author.id
+        try:
+            cid = check_disc(did)
+        except:
+            await ctx.send(
+                f'<@{did}> you need to register first to participate bounty')
+            return
+        await ctx.send("submitted your form\nwait for admin aproval")
+        char = character(cid)
+        bon.cooldown_now()
+        await mbounty(ch1)
+        await self.appoval_s(ctx, bon, ch, ch1, did, bbq, picture, char.name)
+
+    async def appoval_s(self, ctx, bon, ch, ch1, did, bbq, picture, name):
+        bot = self.bot
+        await ch.send("poeple submited a bounty solo")
+        confirm = await mannounce(bot, ch, [did, name], [bbq, picture], "solo")
+        view = MyView(ctx)
+        msg = await ch.send(view=view)
+        await view.wait()
+        if view.value == 'y':
+            await self.announce(ctx, bbq, picture, '<@'+str(did)+'>')
+            await ctx.send(f"<@{did}> your bounty had been approved")
+        elif view.value == 'n':
+            await ctx.send(f"<@{did}> your bounty isnt approved")
+            set_up()
+            bon.cooldown_set(bon.cooldown+1)
+            await mbounty(ch1)
+        await msg.delete()
+        await confirm.delete()
+
+    @commands.hybrid_command(name="submit_npc", description="submit your bounty application to admin")
+    async def submit_npc(self, ctx, bbq: str, picture: str):
+        bot = self.bot
+        ch = bot.get_channel(1020947766203129876)
+        ch1 = bot.get_channel(cd)
+        set_up()
+        bon = bounty(bbq)
+        if bon.cooldown == 0:
+            await ctx.send("cooldown")
+            return
+        did = ctx.author.id
+        try:
+            cid = check_disc(did)
+        except:
+            await ctx.send(
+                f'<@{did}> you need to register first to participate bounty')
+            return
+        char = character(cid)
+        bon.cooldown_now()
+        await mbounty(ch1)
+        await ch.send("poeple submited a bounty solo with npc")
+        confirm = await mannounce(bot, ch, [did, char.name], [bbq, picture], "npc")
+        view = MyView(ctx=ctx)
+        msg = await ch.send(view=view)
+        await ctx.send("submitted your form, wait for admin aproval")
+        await view.wait()
+        if view.value == 'y':
+            await self.announce(ctx, bbq, picture, '<@'+str(did)+'>', "npc")
+            await ctx.send(f"<@{did}> your bounty had been approved")
+        elif view.value == 'n':
+            await ctx.send(f"<@{did}> your bounty isnt approved")
+            set_up()
+            bon.cooldown_set(bon.cooldown+1)
+            await mbounty(ch1)
+        await msg.delete()
+        await confirm.delete()
+
+    @commands.hybrid_command(name="submit_multi", description="submit your bounty application to admin")
+    async def submit_multi(self, ctx, bbq: str, picture: str, second_party: str, third_party: str, fourth_party: str):
+        bot = self.bot
+        ch = bot.get_channel(1020947766203129876)
+        ch1 = bot.get_channel(cd)
+        set_up()
+        bon = bounty(bbq)
+        if bon.cooldown == 0:
+            await ctx.send("cooldown")
+            return
+        arg = [second_party, third_party, fourth_party]
+        did = [ctx.author.id]
+        cid = []
+        try:
+            cid.append(check_disc(did[0]))
+        except:
+            await ctx.send(f'<@{did[0]}> you need to register first to participate bounty')
+            return
+        for i in arg:
             try:
-                cid = check_disc(did)
+                didi = int(i[2:-1])
+                did.append(didi)
+                try:
+                    cidi = check_disc(i)
+                    cid.append(cidi)
+                except:
+                    await ctx.send(
+                        f'<@{didi}> you need to register first to participate bounty')
+                    return
             except:
-                await ctx.send(
-                    f'<@{did}> you need to register first to participate bounty')
-                return
+                None
+        if len(did) == 1:
+            await ctx.send("use submit_npc instead")
+            return
+        bon.cooldown_now()
+        await mbounty(ch1)
+        anjir = [i for i in cid]
+        for i in cid:
             char = character(cid)
-            confirm = await mannounce(bot, ch, [did, char.name], [arg[0], arg[1]], "solo")
-            await confirm.add_reaction("👍")
-            await confirm.add_reaction("👎")
+            anjir.append(char.name)
+        await ch.send("poeple submited a bounty solo with npc")
+        confirm = await mannounce(bot, ch, anjir, [bbq, picture], "multi")
+        view = MyView(ctx=ctx)
+        msg = await ch.send(view=view)
+        await ctx.send("submited your form, wait for admin aproval")
+        await view.wait()
+        if view.value == 'y':
+            if len(did) == 2:
+                await self.announce(ctx, bbq, picture, '<@'+str(did[0])+'>', '<@'+str(did[1])+'>')
+            elif len(did) == 3:
+                await self.announce(ctx, bbq, picture, '<@'+str(did[0])+'>', '<@'+str(did[1])+'>', '<@'+str(did[2])+'>')
+            elif len(did) == 4:
+                await self.announce(ctx, bbq, picture, '<@'+str(did[0])+'>', '<@'+str(did[1])+'>', '<@'+str(did[2])+'>', '<@'+str(did[3])+'>')
+            await ctx.send(f"<@{did}> your bounty had been approved")
+        elif view.value == 'n':
+            await ctx.send(f"<@{did}> your bounty isnt approved")
+            set_up()
+            bon.cooldown_set(bon.cooldown+1)
+            await mbounty(ch1)
+        await msg.delete()
+        await confirm.delete()
 
     @commands.command()
     @commands.has_role(mod_id)
     async def announce(self, ctx, *arg):
-        async for message in ctx.channel.history(limit=1):
-            await message.delete()
         bot = self.bot
         ch = bot.get_channel(anc)
         ch1 = bot.get_channel(cd)
@@ -259,9 +390,9 @@ class Bounty_Event(commands.Cog):
                 return
             a = bon.announce_now('solo', cid)
             if a[-1] == 0:
-                await ctx.send(f"<@{user.id}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
+                await ctx.send(f"<@{did}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
             else:
-                await ctx.send(f"<@{user.id}> reward already distributed, claim it before bounty white day")
+                await ctx.send(f"<@{did}> reward already distributed, claim it before bounty white day")
             await mpromote(ctx, a[-2], ctx.guild.get_member(int(a[0])), ch3, cid)
             await mannounce(bot, ch, a, [arg[0], arg[1]], "solo")
         elif arg[3] == 'npc':
@@ -295,31 +426,15 @@ class Bounty_Event(commands.Cog):
             for i in range(len(cid)):
                 a.append(b[i])
                 if c[i] == 0:
-                    await ctx.send(f"<@{user.id}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
+                    await ctx.send(f"<@{a[i]}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
                 else:
-                    await ctx.send(f"<@{user.id}> reward already distributed, claim it before bounty white day")
+                    await ctx.send(f"<@{a[i]}> reward already distributed, claim it before bounty white day")
                 await mpromote(ctx, d[i], ctx.guild.get_member(int(a[i])), ch3, cid[i])
             await mannounce(bot, ch, a, [arg[0], arg[1]], "multi")
         else:
             return
         await mbounty(ch1)
         await mleaderboard(bot, ch2, ch4)
-
-    @commands.command()
-    @commands.has_role(mod_id)
-    async def debt(self, ctx):
-        set_up()
-        mod = moderator()
-        a = mod.bounty_all()
-        embed = discord.Embed(title="Debt list", color=discord.Color.green())
-        file = discord.File(
-            f'{MISC_PATH}\\Rain_Server.png', filename='serv.png')
-        embed.set_thumbnail(url='attachment://serv.png')
-        for i in range(len(a)):
-            bon = bounty(a[i])
-            embed.add_field(
-                name=a[i], value=f'Solo: {bon.solo_debt()} \nMulti: {bon.multi_debt()}')
-        await ctx.channel.send(file=file, embed=embed)
 
     @commands.command()
     @commands.has_role(mod_id)

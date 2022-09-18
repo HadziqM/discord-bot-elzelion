@@ -354,14 +354,14 @@ class MHFZ_User_Interactive(commands.Cog):
         else:
             await ctx.send(f"sorry this command is on cooldown for you till <t:{char.boostcd}:R>")
 
-    @commands.command()
-    async def join_guild(self, ctx, arg1):
+    @commands.hybrid_command(name="join_guild", description="join guild you want")
+    async def join_guild(self, ctx, guild_name_or_id: str):
         a = ctx.message.author.id
         set_up()
         try:
-            int(arg1)
+            arg1 = int(guild_name_or_id)
         except:
-            arg1 = guild_check(arg1)
+            arg1 = guild_check(guild_name_or_id)
         arg = check_disc(a)
         char = character(arg)
         mod = moderator()

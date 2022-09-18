@@ -25,6 +25,15 @@ class GeneralCog(commands.Cog):
             await message.channel.send('https://tenor.com/view/yes-i-am-yes-i-am-gif-4799231')
             return
 
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        ch = self.bot.get_channel(1006812758647521310)
+        print(error)
+        await ch.send(error)
+        if isinstance(error, commands.CommandOnCooldown):
+            await ctx.send('This command is on a %.2fs cooldown' % error.retry_after)
+            raise error  # re-raise the error so all the errors will still show up in console
+
 
 async def setup(bot):
     await bot.add_cog(GeneralCog(bot))

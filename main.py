@@ -33,5 +33,5 @@ async def mycard(interaction: discord.Interaction, member: discord.Member):
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
     discord.utils.setup_logging()
+    asyncio.run(main())
