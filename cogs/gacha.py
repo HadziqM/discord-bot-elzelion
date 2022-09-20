@@ -145,7 +145,10 @@ async def mevent(ctx, did, bot):
     user = await bot.fetch_user(did)
     gac = gacha(did)
     mod = moderator()
-    rank = mod.disc_all().index(str(ctx.author.id))+1
+    try:
+        rank = mod.disc_all().index(str(ctx.author.id))+1
+    except:
+        rank = "No Rank"
     embed = discord.Embed(title="My Event Status",
                           description=f'Bounty Coin : {gac.bounty}\nGacha Ticket : {gac.ticket}\nPity Count : {gac.pity}\nLatest Bounty : {gac.bbq}\nTime Cleared : <t:{gac.bbq_time}:R>\nBounty Rank : {rank}', color=discord.Color.red())
     embed.set_author(name=user.display_name, icon_url=user.avatar)

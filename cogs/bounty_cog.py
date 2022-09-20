@@ -452,5 +452,35 @@ class Bounty_Event(commands.Cog):
         await ctx.send(f"set bounty {arg} cooldown to {arg2}")
         await mbounty(chan)
 
+    @commands.hybrid_command(name="sunday_routine", description="refresh bounty cd and distribution reward")
+    @commands.has_role(mod_id)
+    async def sunday_routine(self, ctx):
+        ch = self.bot.get_channel(cd)
+        set_up()
+        mod = moderator()
+        mod.bounty_refresh()
+        mod.del_dist()
+        await mbounty(ch)
+        ctx.send("bounty refreshed and whipe up distribution reward")
+
+    @commands.hybrid_command(name="refresh_bounty", description="refresh bounty cd")
+    @commands.has_role(mod_id)
+    async def refresh_bounty(self, ctx):
+        ch = self.bot.get_channel(cd)
+        set_up()
+        mod = moderator()
+        mod.bounty_refresh()
+        await mbounty(ch)
+        ctx.send("bounty refreshed")
+
+    @commands.hybrid_command(name="reset_person_bounty", description="refresh one person cd bounty")
+    @commands.has_role(mod_id)
+    async def reset_cd(self, ctx, player: str):
+        did = int(player[3:-1])
+        gac = gacha(did)
+        gac.set_bbq_time(0)
+        ctx.send(f"succesfully change last clear for <@{did}> to <t:0:R>")
+
+
 async def setup(bot):
     await bot.add_cog(Bounty_Event(bot))

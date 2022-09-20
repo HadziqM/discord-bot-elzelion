@@ -97,6 +97,32 @@ class Guide_Help(commands.Cog):
         await ctx.channel.send(file=file, embed=embed)
 
     @commands.command()
+    async def v2_change(self, ctx):
+        embed = discord.Embed(title='V2.0 Changelog',
+                              color=discord.Color.green())
+        file = discord.File(
+            f'{MISC_PATH}\\Rain_Server.png', filename='serv.png')
+        embed.set_thumbnail(url='attachment://serv.png')
+        embed.add_field(
+            name='INFO', value='bot already updated to v2.0 that will include context menu, hybird command, slash command and button view', inline=False)
+        embed.add_field(
+            name='PART REMOVED', value='!rain id and !rain register is now both deleted', inline=False)
+        embed.add_field(name='ADDED', value='you can use !rain reg instead for registering\n\*!rain reg <in_game_name>*\nor easier just use slash command\n/reg and select ezelion command\n\nnow you can see other people in game status or yourself by right clicking their profile then select app', inline=False)
+        await ctx.channel.send(file=file, embed=embed)
+
+    @commands.command()
+    async def bounty_change(self, ctx):
+        embed = discord.Embed(title='Bounty System Changed',
+                              color=discord.Color.green())
+        file = discord.File(
+            f'{MISC_PATH}\\Rain_Server.png', filename='serv.png')
+        embed.set_thumbnail(url='attachment://serv.png')
+        embed.add_field(
+            name='Info', value='bounty become hazardous since many people participate right now, to make event both enjoyable for player and admin there is some change', inline=False)
+        embed.add_field(name='Change', value='bounty will reset every sunday and also distribution from  bounty and gacha will be deleted, so claim them b4 sunday\n\nto claim bounty now you need to run command on <#940326599474163752>\n you can use normal command or slah command for easier, just use slash command\n*/submit_solo* for solo submision\n*/submit_npc* for solo submision with npc\n*/submit_multi* for multiplayer submision\nfor inputing it, bbq is the name of bounty eg.BBQ01, **its only accept uppercase**\nfor picture you can copy paste picture link\nif you upload image on <#940326599474163752> bot will give you your image link, just copy paste it\nsecond_party, thrird_party and fourth_party just input by ping your teammates\n\nfor multiplier submission one party only need to submit one, no need to submit each player, if your party is bellow 4 just input npc instead of pinnging player', inline=False)
+        await ctx.channel.send(file=file, embed=embed)
+
+    @commands.command()
     async def feature_guide(self, ctx):
         embed = discord.Embed(
             title='List of feature', description='again, this feature only accessable for registered player', color=discord.Color.green())
