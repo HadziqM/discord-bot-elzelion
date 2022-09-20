@@ -20,7 +20,7 @@ print('start')
 
 async def main():
     extension = ['cogs.char', 'cogs.guide', 'cogs.gacha', 'cogs.game',
-                 'cogs.server', 'cogs.bounty_cog', 'cogs.mod', 'cogs.general']
+                 'cogs.server', 'cogs.bounty_cog', 'cogs.mod', 'cogs.test']
     for i in extension:
         await bot.load_extension(i)
     print('confirming token')

@@ -17,10 +17,10 @@ class Guide_Help(commands.Cog):
             f'{MISC_PATH}\\Rain_Server.png', filename='serv.png')
         embed.set_thumbnail(url='attachment://serv.png')
         embed.set_image(
-            url='https://media.discordapp.net/attachments/1009291538733482055/1009300004894162984/register.gif')
+            url='https://media.discordapp.net/attachments/1009291538733482055/1021617500280070154/new_reg.gif')
         embed.add_field(name='Info', value='register feature allow us to bind our discord profile to our charachter in game,\nby registering you could get access to varius feature available in our discord server and in game', inline=False)
         embed.add_field(name='Requirements', value='before you could use register you need to have an account on the rain server and make charachter on it untill successfully enter mezeporta', inline=False)
-        embed.add_field(name='How to', value='first serach your character id on <#965634820367601714> by using command\n*!rain id <your character name>*.\nkeep note that character name is the name of your character in game and not your username used to login into launcher\n\nafter you know your character id you could register by using command\n*!rain register <your character id> <gender>*.\n gender refer to your character gender in game, use m for male and f for female', inline=False)
+        embed.add_field(name='How to', value='first move on to <#965634820367601714> use slash command\n*/reg*\nselect elzelion command and fill in_game_name your character ingame name or nickname of your character\n\nafter that is self explanatory, keep in mind that this command have 30s cd', inline=False)
         await ctx.channel.send(file=file, embed=embed)
 
     @commands.command()
@@ -36,7 +36,7 @@ class Guide_Help(commands.Cog):
             name='Info', value='save transfer allow us to resume your progression in another server by transfering your savedata', inline=False)
         embed.add_field(
             name='Requirements', value='this feature only accessable for registered player, use *!rain register_guide* to see how to register', inline=False)
-        embed.add_field(name='How to', value='first you need to locate your savedata and partner data (optional), if youare playing on local server, the backup save is located on C:\\Erupe\savedata\<your character name>, get the latest date modified savedata.bin and partner.bin.\n\nafter that rename those file to our format\n\n*savedata_rain.bin*\n*partner_rain.bin*\n\nafter that DM <@999140410783957002> your file one by one.\nbot will reply if the transfer is success', inline=False)
+        embed.add_field(name='How to', value='first you need to locate your savedata and partner data, if youare playing on local server, the backup save is located on C:\\Erupe\savedata\<your character name>, get the latest date modified savedata.bin and partner.bin, you can also get other save file like platedata.bin,decomyset.bin etc. from chakaratos save manager\n\nafter that rename those file to our format\n\n```\nsavedata_rain.bin\npartner_rain.bin\ndecomyset_rain.bin\nhunternavi_rain.bin\notomoairou_rain.bin\nplatebox_rain.bin\nplatedata_rain.bin\nplatemyset_rain.bin\nrengokudata_rain.bin\nsavemercenary_rain.bin\nskin_hist_rain.bin\n```\n\nafter that DM <@999140410783957002> your file one by one.\nbot will reply if the transfer is success', inline=False)
         await ctx.channel.send(file=file, embed=embed)
 
     @commands.command()
@@ -50,7 +50,7 @@ class Guide_Help(commands.Cog):
             name='Info', value='bounty is our server main event, there are various bounty quest you can take with really generous reward', inline=False)
         embed.add_field(
             name='Requirements', value='you need to be registered on server', inline=False)
-        embed.add_field(name='How to Participate', value='first you need to know our bounty rules that stated on <#962864233371021342>.\n you can see various quest you can take on <#962712664180654090>, pick one that suit you but please read the requirement carefully before deciding\n\ncheck if bounty is still availabe to take on <#1004686730479292447>.\nafter that just do the quest in game, after you successfully beat the main objectives, screensoot your equipment on quest completion then send it to <#940326599474163752>.\ndont forget to ping <@&937306936939020309> and state the bounty title you take\n\nafter that just let us judge your bonty, if its valid then bot will ping you about the reward.\n\nto see your reward just hop into game and talk to guide lady near enterance', inline=False)
+        embed.add_field(name='How to Participate', value='first you need to know our bounty rules that stated on <#962864233371021342>.\n you can see various quest you can take on <#962712664180654090>, pick one that suit you but please read the requirement carefully before deciding\n\ncheck if bounty is still availabe to take on <#1004686730479292447>.\nafter that just do the quest in game, after you successfully beat the main objectives, screensoot your equipment on quest completion then send it to <#940326599474163752>.\ncopy link of your screeshoot and use submit command to submit your bounty\n\nafter that just let us judge your bonty, if its valid then bot will ping you about the reward.\n\nto see your reward just hop into game and talk to guide lady near enterance', inline=False)
         embed.add_field(name='Bounty Coin', value='beside ingame reward you also got bounty coin which is separated from game feature.\n\nbounty coin will be usefull for upcoming server event and you could also participate bounty leaderboard with it.\ndepending on your achievement you could get promoted and given title at <#1005816626425380944>.\n\nthe title will further boost your bounty coin gain depending on title you had', inline=False)
         await ctx.channel.send(file=file, embed=embed)
 
@@ -131,17 +131,25 @@ class Guide_Help(commands.Cog):
         embed.set_thumbnail(url='attachment://serv.png')
         embed.add_field(
             name='!rain mysave', value='you can use this command to make bot send your backup savedata on our server trough DM', inline=False)
+        embed.add_field(
+            name='!rain mysave_all', value='you can use this command to make bot send all your backup save data', inline=False)
         embed.add_field(name='!rain transmog',
                         value='use this to automatically make transmog unlocked in your character', inline=False)
         embed.add_field(name='!rain mycurrency',
                         value='this command let you see currency owned by you including bounty coin and Gcp', inline=False)
-        embed.add_field(name='!rain join_guild <guild>',
+        embed.add_field(name='!rain join_guild <guild> or just use /join_guild',
                         value='input guild id or guid name after on <guild> to automatically join selected guild if its not full and youare not in any guild\nuse !rain guild to see guild that existed on rain server', inline=False)
         embed.add_field(name='!rain myboost', value='you could see the status of your login boost with this\n available mean its available to take\nactive mean its currently active\ncooldown mean its on cooldown or already used', inline=False)
         embed.add_field(name='!rain myboost_on',
-                        value='this command will make all your login boost to available', inline=False)
+                        value='this command will make all your login boost to available this command have a week cooldown', inline=False)
         embed.add_field(name='!rain myboost_off',
                         value='this command will make all your login boost to cooldown', inline=False)
+        embed.add_field(name='!rain claim_newb',
+                        value='to claim newbie reward yourself if you havent claim b4 and you still on range GR200-500\n\n```\n!rain claim_newb BGM01\n!rain claim_newb BGM02\n!rain claim_newb BGM03\n!rain claim_newb BGM04\n!rain claim_newb BGM05\n!rain claim_newb BGM06\n```\n```\nBGM01 -> Blademaster Generic Mixset 01\nBGM02 -> Blademaster Generic Mixset 03\nBGM03 -> Blademaster Generic Mixset 03\nBGM04 -> Gunner Generic Mixset 01\nBGM05 -> Gunner Generic Mixset 02\nBGM06 -> Blademaster Generic Support Mixset 01\n```', inline=False)
+        embed.add_field(name='/mycard',
+                        value='this to show your card and have various of button for convinience', inline=False)
+        embed.add_field(name='!rain mygacha or right click your profile > app > event ',
+                        value='this to show your event status mainly for bounty event and gacha event', inline=False)
         await ctx.channel.send(file=file, embed=embed)
 
     @commands.command()
