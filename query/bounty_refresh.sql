@@ -13,9 +13,12 @@
  UPDATE bounty SET cooldown=7 WHERE title = 'BBQ13';
  UPDATE bounty SET cooldown=7 WHERE title = 'BBQ14';
  UPDATE bounty SET cooldown=3 WHERE title = 'BBQ15';
- UPDATE bounty SET cooldown=7 WHERE title = 'BBQ16';
+ UPDATE bounty SET cooldown=1 WHERE title = 'BBQ16';
  UPDATE bounty SET cooldown=8 WHERE title = 'BBQ17';
  UPDATE bounty SET cooldown=7 WHERE title = 'BBQ18';
  UPDATE bounty SET cooldown=8 WHERE title = 'BBQ19';
  UPDATE bounty SET cooldown=7 WHERE title = 'BBQ20';
+ UPDATE bounty SET cooldown=5 WHERE title = 'BBQ21';
+ UPDATE bounty SET cooldown=5 WHERE title = 'BBQ22';
+ UPDATE bounty SET cooldown=5 WHERE title = 'BBQ23';
  UPDATE bounty SET cooldown=1 WHERE title = 'SP';

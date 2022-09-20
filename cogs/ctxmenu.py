@@ -34,7 +34,7 @@ async def mcard(member, interact):
     embed.add_field(
         name='Account', value=f'Username : {c}\nUser ID : {b}\nLast Login : <t:{i}:R>', inline=False)
     embed.add_field(
-        name='Character', value=f'Gender : {f}\nHunter Rank : {g}\nGold Rank : {h}', inline=False)
+        name='Character', value=f'Gender : {f}\nHunter Rank : {g} (unrestrained)\nGold Rank : {h}', inline=False)
     embed.add_field(
         name='Guild', value=f'Name : {d}\nGuild ID : {e}', inline=False)
     return await interact.response.send_message(file=file, embed=embed)
