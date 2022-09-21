@@ -223,9 +223,10 @@ class Bounty_Event(commands.Cog):
     async def test(self, ctx):
         await mannounce(self.bot, ctx, [843, 87, 'gitgud', 'Rain'], ["BBQ03", "https://cdn.discordapp.com/attachments/940326599474163752/1020921647944962079/Untitled6.png"], "multi")
 
-    @commands.hybrid_command(name="submit_solo", description="submit your bounty application to admin")
-    async def submit_solo(self, ctx: commands.Context, bbq: str, picture: str):
+    @commands.hybrid_command(name="submit_solo", description="submit your bounty application, input please input picture link with actual link (dont use ')")
+    async def submit_solo(self, ctx: commands.Context, bbq_number: str, picture_link: str):
         bot = self.bot
+        bbq = "BBQ"+bbq_number
         now = int(dt.timestamp(dt.now()))
         gac = gacha(ctx.author.id)
         if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
@@ -250,11 +251,11 @@ class Bounty_Event(commands.Cog):
         char = character(cid)
         bon.cooldown_now()
         await mbounty(ch1)
-        await self.appoval_s(ctx, bon, ch, ch1, did, bbq, picture, char.name, "solo")
+        await self.appoval_s(ctx, bon, ch, ch1, did, bbq, picture_link, char.name, "solo")
 
     async def appoval_s(self, ctx, bon, ch, ch1, did, bbq, picture, name, mt):
         bot = self.bot
-        confirm = await mannounce(bot, ch, [did, name], [bbq, picture], "solo")
+        confirm = await mannounce(bot, ch, [did, name], [bbq, picture], mt)
         view = MyView(ctx)
         msg = await ch.send(view=view)
         await view.wait()
@@ -274,9 +275,10 @@ class Bounty_Event(commands.Cog):
             bon.cooldown_set(bon.cooldown+1)
             await mbounty(ch1)
 
-    @commands.hybrid_command(name="submit_npc", description="submit your bounty application to admin")
-    async def submit_npc(self, ctx, bbq: str, picture: str):
+    @commands.hybrid_command(name="submit_npc", description="submit your bounty application, input please input picture link with actual link (dont use ')")
+    async def submit_npc(self, ctx, bbq_number: str, picture_link: str):
         gac = gacha(ctx.author.id)
+        bbq = "BBQ"+bbq_number
         now = int(dt.timestamp(dt.now()))
         if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
             return await ctx.send(f"sorry you cant take same bounty before <t:{gac.bbq_time+60*60*48}:R>")
@@ -301,11 +303,12 @@ class Bounty_Event(commands.Cog):
         bon.cooldown_now()
         await mbounty(ch1)
         await ctx.send("submitted your form\nwait for admin aproval")
-        await self.appoval_s(ctx, bon, ch, ch1, did, bbq, picture, char.name, "npc")
+        await self.appoval_s(ctx, bon, ch, ch1, did, bbq, picture_link, char.name, "npc")
 
-    @commands.hybrid_command(name="submit_multi", description="submit your bounty application to admin")
-    async def submit_multi(self, ctx, bbq: str, picture: str, second_party: str, third_party: str, fourth_party: str):
+    @commands.hybrid_command(name="submit_multi", description="submit your bounty application, input please input picture link with actual link (dont use ')")
+    async def submit_multi(self, ctx, bbq_number: str, picture_link: str, second_party: str, third_party: str, fourth_party: str):
         bot = self.bot
+        bbq = "BBQ"+bbq_number
         now = int(dt.timestamp(dt.now()))
         ch = bot.get_channel(1020947766203129876)
         ch1 = bot.get_channel(cd)
@@ -355,7 +358,7 @@ class Bounty_Event(commands.Cog):
             char = character(i)
             anjir.append(char.name)
         lgt = len(cid)
-        await self.approve_m(ctx, ch, ch1, bbq, picture, anjir, lgt)
+        await self.approve_m(ctx, ch, ch1, bbq, picture_link, anjir, lgt)
 
     async def approve_m(self, ctx, ch, ch1, bbq, picture, anjir, lgt):
         confirm = await mannounce(self.bot, ch, anjir, [bbq, picture], "multi")

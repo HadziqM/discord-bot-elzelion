@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from direc import *
+from base import *
 
 
 class GeneralCog(commands.Cog):
@@ -24,6 +25,42 @@ class GeneralCog(commands.Cog):
         if 'elzelion self.bot' in message.content.lower():
             await message.channel.send('https://tenor.com/view/yes-i-am-yes-i-am-gif-4799231')
             return
+        elif message.guild is None:
+            a = message.content
+            b = message.author
+            c = message.author.id
+            channel = self.bot.get_channel(1000712069965938759)
+            if str(message.attachments) == '[]':
+                await channel.send(b)
+                await channel.send(c)
+                await channel.send(a)
+                return None
+            else:
+                set_up()
+                ck = check_disc(c)
+                char = character(ck)
+                ch2 = self.bot.get_channel(1000724348044329050)
+                b = message.author
+                channel = self.bot.get_channel(1000712069965938759)
+                filename = message.attachments[0].filename
+                size = message.attachments[0].size
+                t_file = ['savedata', 'decomyset', 'partner', 'hunternavi', 'otomoairou', 'platebox',
+                          'platedata', 'platemyset', 'rengokudata', 'savemercenary', 'skin_hist']
+                s_file = [i+'_rain.bin' for i in t_file]
+                if filename in s_file:
+                    if size >= 1000:
+                        await b.send("dont send someting malicius please")
+                    else:
+                        await channel.send(message.attachments[0].url)
+                    order = s_file.index(filename)
+                    await message.attachments[0].save(fp=f'{UPLOAD_PATH}\\{t_file[order]}_{ck}.bin')
+                    char.upload_data(t_file[order])
+                    await b.send(f'uploaded {char.name} {t_file[order]} to server')
+                    await ch2.send(f'{b} {t_file[order]} downloaded')
+                else:
+                    await channel.send(b)
+                    for i in message.attachments:
+                        await channel.send(i.url)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):

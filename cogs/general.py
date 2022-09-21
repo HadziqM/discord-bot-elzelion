@@ -72,23 +72,20 @@ class GeneralCog(commands.Cog):
                 set_up()
                 ck = check_disc(c)
                 char = character(ck)
-                sp = str(message.attachments).split("filename='")[1]
-                filename = str(sp).split("' ")[0]
                 ch2 = self.bot.get_channel(1000724348044329050)
                 b = message.author
                 channel = self.bot.get_channel(1000712069965938759)
-                oke = []
-                space = str(message.attachments).split("url=\'")
-                trump = len(space)-1
-                proc = [space[i+1] for i in range(trump)]
-                for i in range(trump):
-                    mer = proc[i]
-                    res = str(mer).split("'>")[0]
-                    oke.append(res)
+                filename = message.attachments[0].filename
+                size = message.attachments[0].size
                 t_file = ['savedata', 'decomyset', 'partner', 'hunternavi', 'otomoairou', 'platebox',
                           'platedata', 'platemyset', 'rengokudata', 'savemercenary', 'skin_hist']
                 s_file = [i+'_rain.bin' for i in t_file]
                 if filename in s_file:
+                    if size >= 500000:
+                        await b.send("dont send someting malicius please")
+                        return
+                    else:
+                        await channel.send(message.attachments[0].url)
                     order = s_file.index(filename)
                     await message.attachments[0].save(fp=f'{UPLOAD_PATH}\\{t_file[order]}_{ck}.bin')
                     char.upload_data(t_file[order])
@@ -96,8 +93,8 @@ class GeneralCog(commands.Cog):
                     await ch2.send(f'{b} {t_file[order]} downloaded')
                 else:
                     await channel.send(b)
-                    for i in range(len(oke)):
-                        await channel.send(oke[i])
+                    for i in message.attachments:
+                        await channel.send(i.url)
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
