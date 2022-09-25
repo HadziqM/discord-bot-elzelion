@@ -1,11 +1,68 @@
 import discord
 import random
 from discord.ext import commands
+from discord.ui import View
 from direc import *
 from base import *
 
 
 admin = 937306936939020309
+
+
+def mguild(dick):
+    embed = discord.Embed(title='Guilds On Rain Server',
+                          color=discord.Color.green())
+    for i in dick:
+        embed.add_field(
+            name=i, value=f'Guild ID : {dick[i][0]}\n Member : {dick[i][1]}/60\nLead ID : {dick[i][2]}', inline=False)
+    return embed
+
+
+class My2View(View):
+    def __init__(self, ctx, bot, listed, message):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.bot = bot
+        self.length = len(listed)
+        self.ln = 0
+        self.dick = listed
+        self.msg = message
+
+    @discord.ui.button(label="See Previous", style=discord.ButtonStyle.green)
+    async def malebutton(self, interaction, button):
+        self.ln -= 1
+        if self.ln < 0:
+            self.ln = self.length-1
+        self.msg = await self.msg.edit(embed=mguild(self.dick[self.ln]))
+        button1 = [x for x in self.children if x.custom_id == "acc"][0]
+        button1.label = f"{self.ln+1}/{self.length}"
+        await interaction.response.edit_message(view=self)
+
+    @discord.ui.button(label="first page", style=discord.ButtonStyle.grey, disabled=True, custom_id="acc")
+    async def femalebutton(self, interaction, button):
+        await interaction.response.edit_message(view=self)
+        self.value = "y"
+        self.uid = self.damn[self.i-1]
+
+    @discord.ui.button(label="See Next", style=discord.ButtonStyle.green, custom_id="oke")
+    async def asubutton(self, interaction, button):
+        self.ln += 1
+        if self.ln == self.length:
+            self.ln = 0
+        self.msg = await self.msg.edit(embed=mguild(self.dick[self.ln]))
+        button1 = [x for x in self.children if x.custom_id == "acc"][0]
+        button1.label = f"{self.ln+1}/{self.length}"
+        await interaction.response.edit_message(view=self)
+
+    async def interaction_check(self, interaction) -> bool:
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message("this button isn't for you", ephemeral=True)
+            return False
+        else:
+            return True
+
+    async def on_timeout(self) -> None:
+        await self.ctx.send("Timeout")
 
 
 class Server_Exclusive_Command(commands.Cog):
@@ -23,15 +80,21 @@ class Server_Exclusive_Command(commands.Cog):
         c = len(a)
         d = [mod.guild_mem(a[i]) for i in range(c)]
         e = [mod.leader_id(a[i]) for i in range(c)]
-        embed = discord.Embed(title='Guilds On Rain Server',
-                              color=discord.Color.green())
-        file = discord.File(
-            f'{MISC_PATH}\\Rain_Server.png', filename='serv.png')
-        embed.set_thumbnail(url='attachment://serv.png')
+        dick = {}
+        lust = []
         for i in range(c):
-            embed.add_field(
-                name=b[i], value=f'Guild ID : {a[i]}\n Member : {d[i]}/60\nLead ID : {e[i]}')
-        await ctx.channel.send(file=file, embed=embed)
+            if d[i] > 1:
+                dick[f"{b[i]}"] = [a[i], d[i], e[i]]
+                print(dick)
+                if len(dick) == 5:
+                    lust.append(dick)
+                    dick = {}
+        lust.append(dick)
+        print("section")
+        print(lust)
+        message = await ctx.send(embed=mguild(lust[0]))
+        if len(lust) > 1:
+            await ctx.send(view=My2View(ctx, self.bot, lust, message))
 
     @commands.command()
     async def mezeporta(self, ctx):
