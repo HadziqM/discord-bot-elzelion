@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.utils import get
 from datetime import datetime as dt
 from base import *
 from direc import *
@@ -99,6 +100,8 @@ class GeneralCog(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         ch = self.bot.get_channel(937230168223789068)
+        role = get(member.guild.roles, id=937304763513573446)
+        await member.add_roles(role)
         embed = discord.Embed(title='New Member Joined',
                               description=f'Welcome Hunter <@{member.id}> to Rain Server!', color=discord.Color.green())
         embed.set_thumbnail(url=member.avatar)

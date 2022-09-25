@@ -2,6 +2,7 @@ import random
 import discord
 import numpy as np
 from discord.ext import commands
+from discord import app_commands
 from direc import *
 from base import *
 from board import *
@@ -264,17 +265,9 @@ class Minigame_Event(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def game(self, ctx):
-        role1 = await ctx.guild.create_role(name='player1')
-        role2 = await ctx.guild.create_role(name='player2')
-        await ctx.message.author.remove_roles(role1)
-        await ctx.message.author.remove_roles(role2)
-        await ctx.send("removed")
-
-    @commands.command()
     @commands.cooldown(1, 60, commands.BucketType.guild)
     async def destiny(self, ctx, *arg):
-        user = [ctx.message.author.id]
+        user = [ctx.message.authors.id]
         for i in range(len(arg)-1):
             if int(arg[i][2:-1]) in user:
                 return await ctx.send("there is same people on the list, game aborted")
@@ -393,58 +386,58 @@ class Minigame_Event(commands.Cog):
                 gac.set_gacha(gac.ticket-(10-deck[choice]))
                 break
 
-    @commands.command()
-    async def match(self, ctx, arg):
-        p1 = ctx.message.author
-        p2 = ctx.guild.get_member(int(arg[2:-1]))
-        role1 = await ctx.guild.create_role(name='player1')
-        role2 = await ctx.guild.create_role(name='player2')
-        hp1 = 40
-        hp2 = 40
-        deck1 = []
-        deck2 = []
-        channel1 = self.bot.get_channel(ch1)
-        channel2 = self.bot.get_channel(ch2)
-        announce = self.bot.get_channel(an)
-        await announce.send("begin match")
-        if random.random() >= 0.5:
-            await announce.send(f"<@{p1.id}> attcaking first")
-        else:
-            await announce.send(f"<@{p2.id}> attcaking first")
-            p3 = p1
-            p1 = p2
-            p2 = p3
-        await p1.add_roles(role1)
-        await p2.add_roles(role2)
-        await channel1.send(f'your turn now **attack**\n{prin(draw(deck1,6))}\n HP = {hp1}')
-        await channel2.send(f'{prin(draw(deck2,6))}\n HP = {hp2}')
-        while True:
-            attacker = await turn1(self.bot, channel1, announce, deck1)
-            await channel2.send("your turn now **defense**")
-            defense = await turn2(self.bot, channel2, announce, deck2)
-            dmg = result(attacker, defense)
-            hp2 = result(hp2, dmg)
-            await announce.send(f"p1 inflicted {dmg} damage, p2 has {hp2} HP remaining")
-            if hp2 == 0:
-                await announce.send(f"winner is <@{p1.id}>")
-                break
-            await channel1.send(f'your turn now **defense**\n{prin(draw(deck1,2))}\n HP = {hp1}')
-            await channel2.send(f'{prin(draw(deck2,2))}\n HP = {hp2}')
-            defense = await turn1(self.bot, channel1, announce, deck1)
-            await channel2.send("your turn now **attack**")
-            attacker = await turn2(self.bot, channel2, announce, deck2)
-            dmg = result(attacker, defense)
-            hp1 = result(hp1, dmg)
-            await announce.send(f"p2 inflicted {dmg} damage, p1 has {hp1} HP remaining")
-            if hp1 == 0:
-                await announce.send(f"winner is <@{p1.id}>")
-                break
-            await channel1.send(f'your turn now **attack**\n{prin(draw(deck1,2))}\n HP = {hp1}')
-            await channel2.send(f'{prin(draw(deck2,2))}\n HP = {hp2}')
-        await p1.remove_roles(role1)
-        await p2.remove_roles(role2)
-        await purge(200, channel1)
-        await purge(200, channel2)
+    # @commands.command()
+    # async def match(self, ctx, arg):
+    #     p1 = ctx.message.author
+    #     p2 = ctx.guild.get_member(int(arg[2:-1]))
+    #     role1 = await ctx.guild.create_role(name='player1')
+    #     role2 = await ctx.guild.create_role(name='player2')
+    #     hp1 = 40
+    #     hp2 = 40
+    #     deck1 = []
+    #     deck2 = []
+    #     channel1 = self.bot.get_channel(ch1)
+    #     channel2 = self.bot.get_channel(ch2)
+    #     announce = self.bot.get_channel(an)
+    #     await announce.send("begin match")
+    #     if random.random() >= 0.5:
+    #         await announce.send(f"<@{p1.id}> attcaking first")
+    #     else:
+    #         await announce.send(f"<@{p2.id}> attcaking first")
+    #         p3 = p1
+    #         p1 = p2
+    #         p2 = p3
+    #     await p1.add_roles(role1)
+    #     await p2.add_roles(role2)
+    #     await channel1.send(f'your turn now **attack**\n{prin(draw(deck1,6))}\n HP = {hp1}')
+    #     await channel2.send(f'{prin(draw(deck2,6))}\n HP = {hp2}')
+    #     while True:
+    #         attacker = await turn1(self.bot, channel1, announce, deck1)
+    #         await channel2.send("your turn now **defense**")
+    #         defense = await turn2(self.bot, channel2, announce, deck2)
+    #         dmg = result(attacker, defense)
+    #         hp2 = result(hp2, dmg)
+    #         await announce.send(f"p1 inflicted {dmg} damage, p2 has {hp2} HP remaining")
+    #         if hp2 == 0:
+    #             await announce.send(f"winner is <@{p1.id}>")
+    #             break
+    #         await channel1.send(f'your turn now **defense**\n{prin(draw(deck1,2))}\n HP = {hp1}')
+    #         await channel2.send(f'{prin(draw(deck2,2))}\n HP = {hp2}')
+    #         defense = await turn1(self.bot, channel1, announce, deck1)
+    #         await channel2.send("your turn now **attack**")
+    #         attacker = await turn2(self.bot, channel2, announce, deck2)
+    #         dmg = result(attacker, defense)
+    #         hp1 = result(hp1, dmg)
+    #         await announce.send(f"p2 inflicted {dmg} damage, p1 has {hp1} HP remaining")
+    #         if hp1 == 0:
+    #             await announce.send(f"winner is <@{p1.id}>")
+    #             break
+    #         await channel1.send(f'your turn now **attack**\n{prin(draw(deck1,2))}\n HP = {hp1}')
+    #         await channel2.send(f'{prin(draw(deck2,2))}\n HP = {hp2}')
+    #     await p1.remove_roles(role1)
+    #     await p2.remove_roles(role2)
+    #     await purge(200, channel1)
+    #     await purge(200, channel2)
 
 
 async def setup(bot):
