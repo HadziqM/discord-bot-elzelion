@@ -37,7 +37,7 @@ async def mycard(interaction: discord.Interaction, member: discord.Member):
 
 @bot.tree.context_menu(name="bounty_submit", guild=discord.Object(998783776807194664))
 async def mycard(interaction: discord.Interaction, msg: discord.Message):
-    await msubmit(msg, interaction)
+    await msubmit(msg, interaction, bot)
 
 if __name__ == '__main__':
     discord.utils.setup_logging()
