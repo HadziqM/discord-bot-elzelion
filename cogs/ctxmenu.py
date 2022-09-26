@@ -1,7 +1,8 @@
 from direc import *
 from base import *
 import discord
-from discord.ui import Select, View
+from discord.ui import View
+from bounty_cog import *
 
 
 icon1 = ['\\GS.png', '\\HS.png', '\\H.png', '\\L.png', '\\SS.png', '\\LB.png', '\\DS.png',
@@ -93,7 +94,7 @@ async def mevent(member, interact):
     await interact.response.send_message(content=None, embed=embed)
 
 
-async def msubmit(msg, interact):
+async def msubmit(msg, interact, bot):
     if interact.user.id != msg.author.id:
         return await interact.response.send_message("its not your own")
     if str(msg.attachments) == '[]':
@@ -102,5 +103,7 @@ async def msubmit(msg, interact):
     views = SubmitB(interact)
     await interact.response.send_message(view=views)
     await views.wait()
-    await interact.followup.send(views.value1)
-    await interact.followup.send(views.value2)
+    if views.value2 == "solo":
+        await submit_solo_after(bot, interact, views.value1, msg.attachments[0].url, "solo")
+    else:
+        await submit_solo_after(bot, interact, views.value1, msg.attachments[0].url, "npc")

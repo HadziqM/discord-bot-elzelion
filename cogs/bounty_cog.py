@@ -242,6 +242,31 @@ async def appoval_s(interaction, bon, ch, ch1, did, bbq, picture, name, mt, time
         await mbounty(ch1)
 
 
+async def approve_m(interaction, ch, ch1, bbq, picture, anjir, lgt, time, bot, did):
+    confirm = await mannounce(bot, ch, anjir, [bbq, picture], "multi")
+    view = MyView(ctx=interaction)
+    msg = await ch.send(view=view)
+    await view.wait()
+    if view.value == 'y':
+        ch_an = bot.get_channel(anc)
+        arg = [bbq, picture, did, "multi"]
+        await msg.delete()
+        await confirm.delete()
+        await interaction.followup.send(f"<@{anjir[0]}> submision and co. had been approved by {view.uss}")
+        await mannounce(bot, ch_an, anjir, [bbq, picture], "multi")
+        await announce(bot, interaction, arg)
+    elif view.value == 'n':
+        await interaction.followup.send(f"<@{anjir[0]}> submision and co. isnt approved by {view.uss}")
+        await msg.delete()
+        await confirm.delete()
+        set_up()
+        for i in range(lgt):
+            gacha(anjir[i]).set_bbq_time(time[i])
+        bon = bounty(bbq)
+        bon.cooldown_set(bon.cooldown+1)
+        await mbounty(ch1)
+
+
 async def announce(bot, ctx, arg):
     ch2 = bot.get_channel(lead)
     ch3 = bot.get_channel(promo)
@@ -288,29 +313,90 @@ async def announce(bot, ctx, arg):
     await mleaderboard(bot, ch2, ch4)
 
 
-async def approve_m(interaction, ch, ch1, bbq, picture, anjir, lgt, time, bot, did):
-    confirm = await mannounce(bot, ch, anjir, [bbq, picture], "multi")
-    view = MyView(ctx=interaction)
-    msg = await ch.send(view=view)
-    await view.wait()
-    if view.value == 'y':
-        ch_an = bot.get_channel(anc)
-        arg = [bbq, picture, did, "multi"]
-        await msg.delete()
-        await confirm.delete()
-        await interaction.followup.send(f"<@{anjir[0]}> submision and co. had been approved by {view.uss}")
-        await mannounce(bot, ch_an, anjir, [bbq, picture], "multi")
-        await announce(bot, interaction, arg)
-    elif view.value == 'n':
-        await interaction.followup.send(f"<@{anjir[0]}> submision and co. isnt approved by {view.uss}")
-        await msg.delete()
-        await confirm.delete()
-        set_up()
-        for i in range(lgt):
-            gacha(anjir[i]).set_bbq_time(time[i])
+async def submit_solo_after(bot, interaction, bbq, picture_link, methode):
+    now = int(dt.timestamp(dt.now()))
+    gac = gacha(interaction.user.id)
+    if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
+        return await interaction.followup.send(f"sorry you cant take same bounty before <t:{gac.bbq_time+60*60*48}:R>")
+    elif gac.bbq != bbq and now < (gac.bbq_time + 60*60*24):
+        return await interaction.followup.send(f"sorry you cant take this bounty before <t:{gac.bbq_time+60*60*24}:R>")
+    time = gac.bbq_time
+    gac.set_bbq_time(int(dt.timestamp(dt.now())))
+    ch = bot.get_channel(1020947766203129876)
+    ch1 = bot.get_channel(cd)
+    set_up()
+    try:
         bon = bounty(bbq)
-        bon.cooldown_set(bon.cooldown+1)
-        await mbounty(ch1)
+    except:
+        return await interaction.followup.send("wrong input")
+    if bon.cooldown == 0:
+        await interaction.followup.send("cooldown")
+        return
+    did = interaction.user.id
+    try:
+        cid = check_disc(did)
+    except:
+        await interaction.followup.send(
+            f'<@{did}> you need to register first to participate bounty')
+        return
+    await interaction.followup.send("submitted your form\nwait for admin aproval")
+    char = character(cid)
+    bon.cooldown_now()
+    await mbounty(ch1)
+    await appoval_s(interaction, bon, ch, ch1, did, bbq, picture_link, char.name, methode, time, bot)
+
+
+async def submit_multi_after(bot, interaction, bbq, picture_link, mentions):
+    now = int(dt.timestamp(dt.now()))
+    ch = bot.get_channel(1020947766203129876)
+    ch1 = bot.get_channel(cd)
+    set_up()
+    try:
+        bon = bounty(bbq)
+    except:
+        return await interaction.followup.send("wrong input")
+    if bon.cooldown == 0:
+        await interaction.followup.send("cooldown")
+        return
+    did = [interaction.user.id]
+    for i in re.findall("<@!?([0-9]+)>", mentions):
+        did.append(int(i))
+    print(did)
+    cid = []
+    for i in did:
+        try:
+            try:
+                cidi = check_disc(i)
+                cid.append(cidi)
+            except:
+                await interaction.followup.send(
+                    f'<@{i}> you need to register first to participate bounty')
+                return
+        except:
+            None
+    if len(did) == 1:
+        await interaction.followup.send("use submit_npc instead")
+        return
+    time = []
+    for i in did:
+        gac = gacha(i)
+        if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
+            return await interaction.followup.send(f"sorry <@{i}> cant take same bounty before <t:{gac.bbq_time+60*60*48}:R>")
+        elif gac.bbq != bbq and now < (gac.bbq_time + 60*60*24):
+            return await interaction.followup.send(f"sorry <@{i}> cant take this bounty before <t:{gac.bbq_time+60*60*24}:R>")
+        time.append(gac.bbq_time)
+    for i in did:
+        gac.set_bbq_time(int(dt.timestamp(dt.now())))
+    await interaction.followup.send("sent your team submission to admin")
+    bon.cooldown_now()
+    await mbounty(ch1)
+    anjir = [i for i in did]
+    for i in cid:
+        char = character(i)
+        anjir.append(char.name)
+    lgt = len(cid)
+    print(anjir)
+    await approve_m(interaction, ch, ch1, bbq, picture_link, anjir, lgt, time, bot, did)
 
 
 class Bounty_Event(commands.Cog):
@@ -327,127 +413,17 @@ class Bounty_Event(commands.Cog):
     @app_commands.command(name="submit_solo", description="submit your bounty application, input please input picture link with actual link (dont use ')")
     async def submit_solo(self, interaction: discord.Interaction, bbq: Literal["BBQ01", "BBQ02", "BBQ03", "BBQ04", "BBQ05", "BBQ06", "BBQ07", "BBQ08", "BBQ09", "BBQ10", "BBQ11", "BBQ12", "BBQ13", "BBQ14", "BBQ15", "BBQ16", "BBQ17", "BBQ18", "BBQ19", "BBQ20", "BBQ21", "BBQ22", "BBQ23", "SP"], picture_link: str):
         await interaction.response.defer()
-        bot = self.bot
-        now = int(dt.timestamp(dt.now()))
-        gac = gacha(interaction.user.id)
-        if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
-            return await interaction.followup.send(f"sorry you cant take same bounty before <t:{gac.bbq_time+60*60*48}:R>")
-        elif gac.bbq != bbq and now < (gac.bbq_time + 60*60*24):
-            return await interaction.followup.send(f"sorry you cant take this bounty before <t:{gac.bbq_time+60*60*24}:R>")
-        time = gac.bbq_time
-        gac.set_bbq_time(int(dt.timestamp(dt.now())))
-        ch = bot.get_channel(1020947766203129876)
-        ch1 = bot.get_channel(cd)
-        set_up()
-        try:
-            bon = bounty(bbq)
-        except:
-            return await interaction.followup.send("wrong input")
-        if bon.cooldown == 0:
-            await interaction.followup.send("cooldown")
-            return
-        did = interaction.user.id
-        try:
-            cid = check_disc(did)
-        except:
-            await interaction.followup.send(
-                f'<@{did}> you need to register first to participate bounty')
-            return
-        await interaction.followup.send("submitted your form\nwait for admin aproval")
-        char = character(cid)
-        bon.cooldown_now()
-        await mbounty(ch1)
-        await appoval_s(interaction, bon, ch, ch1, did, bbq, picture_link, char.name, "solo", time, self.bot)
+        await submit_solo_after(self.bot, interaction, bbq, picture_link, "solo")
 
     @app_commands.command(name="submit_npc", description="submit your bounty application, input please input picture link with actual link (dont use ')")
     async def submit_npc(self, interaction: discord.Interaction, bbq: Literal["BBQ01", "BBQ02", "BBQ03", "BBQ04", "BBQ05", "BBQ06", "BBQ07", "BBQ08", "BBQ09", "BBQ10", "BBQ11", "BBQ12", "BBQ13", "BBQ14", "BBQ15", "BBQ16", "BBQ17", "BBQ18", "BBQ19", "BBQ20", "BBQ21", "BBQ22", "BBQ23", "SP"], picture_link: str):
         await interaction.response.defer()
-        bot = self.bot
-        now = int(dt.timestamp(dt.now()))
-        gac = gacha(interaction.user.id)
-        if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
-            return await interaction.followup.send(f"sorry you cant take same bounty before <t:{gac.bbq_time+60*60*48}:R>")
-        elif gac.bbq != bbq and now < (gac.bbq_time + 60*60*24):
-            return await interaction.followup.send(f"sorry you cant take this bounty before <t:{gac.bbq_time+60*60*24}:R>")
-        time = gac.bbq_time
-        gac.set_bbq_time(int(dt.timestamp(dt.now())))
-        ch = bot.get_channel(1020947766203129876)
-        ch1 = bot.get_channel(cd)
-        set_up()
-        try:
-            bon = bounty(bbq)
-        except:
-            return await interaction.followup.send("wrong input")
-        if bon.cooldown == 0:
-            await interaction.followup.send("cooldown")
-            return
-        did = interaction.user.id
-        try:
-            cid = check_disc(did)
-        except:
-            await interaction.followup.send(
-                f'<@{did}> you need to register first to participate bounty')
-            return
-        await interaction.followup.send("submitted your form\nwait for admin aproval")
-        char = character(cid)
-        bon.cooldown_now()
-        await mbounty(ch1)
-        await appoval_s(interaction, bon, ch, ch1, did, bbq, picture_link, char.name, "npc", time, self.bot)
+        await submit_solo_after(self.bot, interaction, bbq, picture_link, "npc")
 
     @app_commands.command(name="submit_multi", description="submit your bounty application, input please input picture link with actual link (dont use ')")
     async def submit_multi(self, interaction: discord.Interaction, bbq: Literal["BBQ01", "BBQ02", "BBQ03", "BBQ04", "BBQ05", "BBQ06", "BBQ07", "BBQ08", "BBQ09", "BBQ10", "BBQ11", "BBQ12", "BBQ13", "BBQ14", "BBQ15", "BBQ16", "BBQ17", "BBQ18", "BBQ19", "BBQ20", "BBQ21", "BBQ22", "BBQ23", "SP"], picture_link: str, mentions: str):
         await interaction.response.defer()
-        bot = self.bot
-        now = int(dt.timestamp(dt.now()))
-        ch = bot.get_channel(1020947766203129876)
-        ch1 = bot.get_channel(cd)
-        set_up()
-        try:
-            bon = bounty(bbq)
-        except:
-            return await interaction.followup.send("wrong input")
-        if bon.cooldown == 0:
-            await interaction.followup.send("cooldown")
-            return
-        did = [interaction.user.id]
-        for i in re.findall("<@!?([0-9]+)>", mentions):
-            did.append(int(i))
-        print(did)
-        cid = []
-        for i in did:
-            try:
-                try:
-                    cidi = check_disc(i)
-                    cid.append(cidi)
-                except:
-                    await interaction.followup.send(
-                        f'<@{i}> you need to register first to participate bounty')
-                    return
-            except:
-                None
-        if len(did) == 1:
-            await interaction.followup.send("use submit_npc instead")
-            return
-        time = []
-        for i in did:
-            gac = gacha(i)
-            if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
-                return await interaction.followup.send(f"sorry <@{i}> cant take same bounty before <t:{gac.bbq_time+60*60*48}:R>")
-            elif gac.bbq != bbq and now < (gac.bbq_time + 60*60*24):
-                return await interaction.followup.send(f"sorry <@{i}> cant take this bounty before <t:{gac.bbq_time+60*60*24}:R>")
-            time.append(gac.bbq_time)
-        for i in did:
-            gac.set_bbq_time(int(dt.timestamp(dt.now())))
-        await interaction.followup.send("sent your team submission to admin")
-        bon.cooldown_now()
-        await mbounty(ch1)
-        anjir = [i for i in did]
-        for i in cid:
-            char = character(i)
-            anjir.append(char.name)
-        lgt = len(cid)
-        print(anjir)
-        await self.approve_m(interaction, ch, ch1, bbq, picture_link, anjir, lgt, time, self.bot, did)
+        await submit_multi_after(self.bot, interaction, bbq, picture_link, mentions)
 
     @commands.command()
     @commands.has_role(mod_id)
