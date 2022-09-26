@@ -48,7 +48,10 @@ async def mevent(member, interact):
         rank = mod.disc_all().index(str(member.id))+1
     except:
         rank = "No Rank"
+    x = f"<t:{gac.bbq_time}:R>"
+    if gac.bbq_time == 0:
+        x = "Not Yet"
     embed = discord.Embed(title="My Event Status",
-                          description=f'Bounty Coin : {gac.bounty}\nGacha Ticket : {gac.ticket}\nPity Count : {gac.pity}\nLatest Bounty : {gac.bbq}\nTime Cleared : <t:{gac.bbq_time}:R>\nBounty Rank : {rank}', color=discord.Color.red())
+                          description=f'Bounty Coin : {gac.bounty}\nGacha Ticket : {gac.ticket}\nPity Count : {gac.pity}\nLatest Bounty : {gac.bbq}\nTime Cleared : {x}\nBounty Rank : {rank}', color=discord.Color.red())
     embed.set_author(name=user.display_name, icon_url=user.avatar)
     await interact.response.send_message(content=None, embed=embed)

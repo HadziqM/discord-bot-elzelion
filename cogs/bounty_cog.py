@@ -9,6 +9,7 @@ from datetime import datetime as dt
 from direc import *
 from base import *
 from discord.ui import View
+from typing import Literal
 
 main = database()
 anc = int(main.announce)
@@ -224,10 +225,9 @@ class Bounty_Event(commands.Cog):
         await mbounty(chan)
 
     @commands.hybrid_command(name="submit_solo", description="submit your bounty application, input please input picture link with actual link (dont use ')")
-    async def submit_solo(self, ctx: commands.Context, bbq_number: str, picture_link: str):
+    async def submit_solo(self, ctx: commands.Context, bbq: Literal["BBQ01", "BBQ02", "BBQ03", "BBQ04", "BBQ05", "BBQ06", "BBQ07", "BBQ08", "BBQ09", "BBQ10", "BBQ11", "BBQ12", "BBQ13", "BBQ14", "BBQ15", "BBQ16", "BBQ17", "BBQ18", "BBQ19", "BBQ20", "BBQ21", "BBQ22", "BBQ23", "SP"], picture_link: str):
         await ctx.interaction.response.defer()
         bot = self.bot
-        bbq = "BBQ"+bbq_number
         now = int(dt.timestamp(dt.now()))
         gac = gacha(ctx.author.id)
         if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
@@ -239,7 +239,10 @@ class Bounty_Event(commands.Cog):
         ch = bot.get_channel(1020947766203129876)
         ch1 = bot.get_channel(cd)
         set_up()
-        bon = bounty(bbq)
+        try:
+            bon = bounty(bbq)
+        except:
+            return await ctx.send("wrong input")
         if bon.cooldown == 0:
             await ctx.send("cooldown")
             return
@@ -281,10 +284,9 @@ class Bounty_Event(commands.Cog):
             await mbounty(ch1)
 
     @commands.hybrid_command(name="submit_npc", description="submit your bounty application, input please input picture link with actual link (dont use ')")
-    async def submit_npc(self, ctx, bbq_number: str, picture_link: str):
+    async def submit_npc(self, ctx, bbq: Literal["BBQ01", "BBQ02", "BBQ03", "BBQ04", "BBQ05", "BBQ06", "BBQ07", "BBQ08", "BBQ09", "BBQ10", "BBQ11", "BBQ12", "BBQ13", "BBQ14", "BBQ15", "BBQ16", "BBQ17", "BBQ18", "BBQ19", "BBQ20", "BBQ21", "BBQ22", "BBQ23", "SP"], picture_link: str):
         await ctx.interaction.response.defer()
         gac = gacha(ctx.author.id)
-        bbq = "BBQ"+bbq_number
         now = int(dt.timestamp(dt.now()))
         if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
             return await ctx.send(f"sorry you cant take same bounty before <t:{gac.bbq_time+60*60*48}:R>")
@@ -296,7 +298,10 @@ class Bounty_Event(commands.Cog):
         ch = bot.get_channel(1020947766203129876)
         ch1 = bot.get_channel(cd)
         set_up()
-        bon = bounty(bbq)
+        try:
+            bon = bounty(bbq)
+        except:
+            return await ctx.send("wrong input")
         if bon.cooldown == 0:
             await ctx.send("cooldown")
             return
@@ -314,15 +319,17 @@ class Bounty_Event(commands.Cog):
         await self.appoval_s(ctx, bon, ch, ch1, did, bbq, picture_link, char.name, "npc", time)
 
     @commands.hybrid_command(name="submit_multi", description="submit your bounty application, input please input picture link with actual link (dont use ')")
-    async def submit_multi(self, ctx, bbq_number: str, picture_link: str, mentions: str):
+    async def submit_multi(self, ctx, bbq: Literal["BBQ01", "BBQ02", "BBQ03", "BBQ04", "BBQ05", "BBQ06", "BBQ07", "BBQ08", "BBQ09", "BBQ10", "BBQ11", "BBQ12", "BBQ13", "BBQ14", "BBQ15", "BBQ16", "BBQ17", "BBQ18", "BBQ19", "BBQ20", "BBQ21", "BBQ22", "BBQ23", "SP"], picture_link: str, mentions: str):
         await ctx.interaction.response.defer()
         bot = self.bot
-        bbq = "BBQ"+bbq_number
         now = int(dt.timestamp(dt.now()))
         ch = bot.get_channel(1020947766203129876)
         ch1 = bot.get_channel(cd)
         set_up()
-        bon = bounty(bbq)
+        try:
+            bon = bounty(bbq)
+        except:
+            return await ctx.send("wrong input")
         if bon.cooldown == 0:
             await ctx.send("cooldown")
             return
@@ -355,6 +362,7 @@ class Bounty_Event(commands.Cog):
             elif gac.bbq != bbq and now < (gac.bbq_time + 60*60*24):
                 return await ctx.send(f"sorry <@{i}> cant take this bounty before <t:{gac.bbq_time+60*60*24}:R>")
             time.append(gac.bbq_time)
+        for i in did:
             gac.set_bbq_time(int(dt.timestamp(dt.now())))
         await ctx.send("sent your team submission to admin")
         bon.cooldown_now()
@@ -398,7 +406,6 @@ class Bounty_Event(commands.Cog):
     async def announce(self, ctx, *arg):
         bot = self.bot
         ch = bot.get_channel(anc)
-        ch1 = bot.get_channel(cd)
         ch2 = bot.get_channel(lead)
         ch3 = bot.get_channel(promo)
         ch4 = bot.get_channel(1009415908927733811)
@@ -450,7 +457,6 @@ class Bounty_Event(commands.Cog):
             await mannounce(bot, ch, a, [arg[0], arg[1]], "multi")
         else:
             return
-        await mbounty(ch1)
         await mleaderboard(bot, ch2, ch4)
 
     @commands.command()
@@ -477,12 +483,13 @@ class Bounty_Event(commands.Cog):
     @commands.hybrid_command(name="refresh_bounty", description="refresh bounty cd")
     @commands.has_role(mod_id)
     async def refresh_bounty(self, ctx):
+        await ctx.interaction.response.defer()
         ch = self.bot.get_channel(cd)
         set_up()
         mod = moderator()
         mod.bounty_refresh()
         await mbounty(ch)
-        ctx.send("bounty refreshed")
+        await ctx.send("bounty refreshed")
 
     @commands.hybrid_command(name="reset_person_bounty", description="refresh one person cd bounty")
     @commands.has_role(mod_id)
@@ -492,6 +499,15 @@ class Bounty_Event(commands.Cog):
         gac = gacha(did)
         gac.set_bbq_time(0)
         await ctx.send(f"succesfully change last clear for <@{did}> to None")
+
+    @commands.hybrid_command(name="reset_cd_bounty_all", description="refresh all person cd bounty")
+    @commands.has_role(mod_id)
+    async def reset_cd_all(self, ctx):
+        await ctx.interaction.response.defer()
+        for i in moderator.disc_all():
+            gac = gacha(i)
+            gac.set_bbq_time(0)
+        await ctx.send(f"succesfully change all player last clear to None")
 
 
 async def setup(bot):
