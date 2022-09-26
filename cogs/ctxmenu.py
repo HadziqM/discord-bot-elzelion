@@ -1,11 +1,47 @@
 from direc import *
 from base import *
 import discord
+from discord.ui import Select, View
 
 
 icon1 = ['\\GS.png', '\\HS.png', '\\H.png', '\\L.png', '\\SS.png', '\\LB.png', '\\DS.png',
          '\\LS.png', '\\HH.png', '\\GL.png', '\\B.png', '\\T.png', '\\SAF.png', '\\MS.png']
 icon = [ICON_PATH+icon1[i] for i in range(len(icon1))]
+
+
+class SubmitB(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=120)
+        self.ctx = ctx
+        self.value1 = None
+        self.value2 = None
+
+    @discord.ui.select(placeholder="Bounty Title", min_values=1, max_values=1, options=[discord.SelectOption(label='BBQ01', value='BBQ01'), discord.SelectOption(label='BBQ02', value='BBQ02'), discord.SelectOption(label='BBQ03', value='BBQ03'), discord.SelectOption(label='BBQ04', value='BBQ04'), discord.SelectOption(label='BBQ05', value='BBQ05'), discord.SelectOption(label='BBQ06', value='BBQ06'), discord.SelectOption(label='BBQ07', value='BBQ07'), discord.SelectOption(label='BBQ08', value='BBQ08'), discord.SelectOption(label='BBQ09', value='BBQ09'), discord.SelectOption(label='BBQ10', value='BBQ10'), discord.SelectOption(label='BBQ11', value='BBQ11'), discord.SelectOption(label='BBQ12', value='BBQ12'), discord.SelectOption(label='BBQ13', value='BBQ13'), discord.SelectOption(label='BBQ14', value='BBQ14'), discord.SelectOption(label='BBQ15', value='BBQ15'), discord.SelectOption(label='BBQ16', value='BBQ16'), discord.SelectOption(label='BBQ17', value='BBQ17'), discord.SelectOption(label='BBQ18', value='BBQ18'), discord.SelectOption(label='BBQ19', value='BBQ19'), discord.SelectOption(label='BBQ20', value='BBQ20'), discord.SelectOption(label='BBQ21', value='BBQ21'), discord.SelectOption(label='BBQ22', value='BBQ22'), discord.SelectOption(label='BBQ23', value='BBQ23'), discord.SelectOption(label='SP', value='SP')])
+    async def on_select(self, interaction, select):
+        select.disabled = True
+        await interaction.response.edit_message(view=self)
+        self.value1 = select.values[0]
+        if self.value2 != None:
+            self.stop()
+
+    @discord.ui.select(placeholder="Bounty Methode", min_values=1, max_values=1, options=[discord.SelectOption(
+        label="solo", value="solo"), discord.SelectOption(label="solo with npc", value="npc")])
+    async def on_select1(self, interaction, select):
+        select.disabled = True
+        await interaction.response.edit_message(view=self)
+        self.value2 = select.values[0]
+        if self.value1 != None:
+            self.stop()
+
+    async def interaction_check(self, interaction):
+        if interaction.user != self.ctx.user:
+            await interaction.response.send_message("this button isn't for you", ephemeral=True)
+            return False
+        else:
+            return True
+
+    async def on_timeout(self) -> None:
+        await self.ctx.followup.send("Timeout")
 
 
 async def mcard(member, interact):
@@ -55,3 +91,16 @@ async def mevent(member, interact):
                           description=f'Bounty Coin : {gac.bounty}\nGacha Ticket : {gac.ticket}\nPity Count : {gac.pity}\nLatest Bounty : {gac.bbq}\nTime Cleared : {x}\nBounty Rank : {rank}', color=discord.Color.red())
     embed.set_author(name=user.display_name, icon_url=user.avatar)
     await interact.response.send_message(content=None, embed=embed)
+
+
+async def msubmit(msg, interact):
+    if interact.user.id != msg.author.id:
+        return await interact.response.send_message("its not your own")
+    if str(msg.attachments) == '[]':
+        return await interact.response.send_message("there is no attachments/image")
+    # link = msg.attachments[0].url
+    views = SubmitB(interact)
+    await interact.response.send_message(view=views)
+    await views.wait()
+    await interact.followup.send(views.value1)
+    await interact.followup.send(views.value2)
