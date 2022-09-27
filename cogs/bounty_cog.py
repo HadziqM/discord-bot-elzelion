@@ -214,7 +214,7 @@ class MyView(View):
         self.stop()
 
 
-async def appoval_s(interaction, bon, ch, ch1, did, bbq, picture, name, mt, time, bot):
+async def appoval_s(interaction, ch, ch1, did, bbq, picture, name, mt, time, bot):
     confirm = await mannounce(bot, ch, [did, name], [bbq, picture], mt)
     view = MyView(interaction)
     msg = await ch.send(view=view)
@@ -236,6 +236,7 @@ async def appoval_s(interaction, bon, ch, ch1, did, bbq, picture, name, mt, time
         await confirm.delete()
         await interaction.followup.send(f"<@{did}> your bounty isnt approved by {view.uss}")
         set_up()
+        bon = bounty(bbq)
         bon.cooldown_set(bon.cooldown+1)
         gac = gacha(did)
         gac.set_bbq_time(time)
@@ -343,7 +344,7 @@ async def submit_solo_after(bot, interaction, bbq, picture_link, methode):
     char = character(cid)
     bon.cooldown_now()
     await mbounty(ch1)
-    await appoval_s(interaction, bon, ch, ch1, did, bbq, picture_link, char.name, methode, time, bot)
+    await appoval_s(interaction, ch, ch1, did, bbq, picture_link, char.name, methode, time, bot)
 
 
 async def submit_multi_after(bot, interaction, bbq, picture_link, mentions):
@@ -360,8 +361,9 @@ async def submit_multi_after(bot, interaction, bbq, picture_link, mentions):
         return
     did = [interaction.user.id]
     for i in re.findall("<@!?([0-9]+)>", mentions):
+        if interaction.user.id == i:
+            return await interaction.followup.send("you cant ping yourself")
         did.append(int(i))
-    print(did)
     cid = []
     for i in did:
         try:

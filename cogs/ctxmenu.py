@@ -1,3 +1,4 @@
+from importlib.resources import contents
 from direc import *
 from base import *
 import discord
@@ -33,6 +34,30 @@ class SubmitB(View):
         self.value2 = select.values[0]
         if self.value1 != None:
             self.stop()
+
+    async def interaction_check(self, interaction):
+        if interaction.user != self.ctx.user:
+            await interaction.response.send_message("this button isn't for you", ephemeral=True)
+            return False
+        else:
+            return True
+
+    async def on_timeout(self) -> None:
+        await self.ctx.followup.send("Timeout")
+
+
+class SubmitC(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=120)
+        self.ctx = ctx
+        self.value1 = None
+
+    @discord.ui.select(placeholder="Bounty Title", min_values=1, max_values=1, options=[discord.SelectOption(label='BBQ01', value='BBQ01'), discord.SelectOption(label='BBQ02', value='BBQ02'), discord.SelectOption(label='BBQ03', value='BBQ03'), discord.SelectOption(label='BBQ04', value='BBQ04'), discord.SelectOption(label='BBQ05', value='BBQ05'), discord.SelectOption(label='BBQ06', value='BBQ06'), discord.SelectOption(label='BBQ07', value='BBQ07'), discord.SelectOption(label='BBQ08', value='BBQ08'), discord.SelectOption(label='BBQ09', value='BBQ09'), discord.SelectOption(label='BBQ10', value='BBQ10'), discord.SelectOption(label='BBQ11', value='BBQ11'), discord.SelectOption(label='BBQ12', value='BBQ12'), discord.SelectOption(label='BBQ13', value='BBQ13'), discord.SelectOption(label='BBQ14', value='BBQ14'), discord.SelectOption(label='BBQ15', value='BBQ15'), discord.SelectOption(label='BBQ16', value='BBQ16'), discord.SelectOption(label='BBQ17', value='BBQ17'), discord.SelectOption(label='BBQ18', value='BBQ18'), discord.SelectOption(label='BBQ19', value='BBQ19'), discord.SelectOption(label='BBQ20', value='BBQ20'), discord.SelectOption(label='BBQ21', value='BBQ21'), discord.SelectOption(label='BBQ22', value='BBQ22'), discord.SelectOption(label='BBQ23', value='BBQ23'), discord.SelectOption(label='SP', value='SP')])
+    async def on_select(self, interaction, select):
+        select.disabled = True
+        await interaction.response.edit_message(view=self)
+        self.value1 = select.values[0]
+        self.stop()
 
     async def interaction_check(self, interaction):
         if interaction.user != self.ctx.user:
@@ -107,3 +132,24 @@ async def msubmit(msg, interact, bot):
         await submit_solo_after(bot, interact, views.value1, msg.attachments[0].url, "solo")
     else:
         await submit_solo_after(bot, interact, views.value1, msg.attachments[0].url, "npc")
+
+
+async def msubmit_multi(msg, interact, bot):
+    if interact.user.id != msg.author.id:
+        return await interact.response.send_message("its not your own")
+    if str(msg.attachments) == '[]':
+        return await interact.response.send_message("there is no attachments/image")
+    link = msg.attachments[0].url
+    did = [interact.user.id]
+    for i in re.findall("<@!?([0-9]+)>", msg.content):
+        did.append(int(i))
+    if len(did) == 1:
+        return await interact.response.send_message("no mentions detected")
+    await interact.response.defer()
+    text = "Multiplayer Submission With Party "
+    for i in did:
+        text += f"<@{i}> "
+    views = SubmitC(interact)
+    await interact.followup.send(content=text, view=views, allowed_mentions=discord.AllowedMentions(roles=False, users=False, everyone=False))
+    await views.wait()
+    await submit_multi_after(bot, interact, views.value1, link, msg.content)

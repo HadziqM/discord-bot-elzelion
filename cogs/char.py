@@ -1,3 +1,5 @@
+from textwrap import indent
+from unicodedata import name
 import discord
 import asyncio
 from discord import app_commands
@@ -217,6 +219,47 @@ class MyView(View):
         await self.ctx.send("Timeout")
 
 
+class NewbView(View):
+    def __init__(self, ctx, msg, pict, sett):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.value = None
+        self.msg = msg
+        self.pict = pict
+        self.sett = sett
+        self.indexx = 0
+
+    @discord.ui.button(label="Claim This Set", style=discord.ButtonStyle.green)
+    async def malebutton(self, interaction, button):
+        self.value = self.sett[self.indexx]
+        self.stop()
+
+    @discord.ui.button(label="See Other Set", style=discord.ButtonStyle.blurple)
+    async def femalebutton(self, interaction, button):
+        self.indexx += 1
+        if self.indexx == 5:
+            self.indexx = 0
+        await self.msg.edit(embed=makenewb(self.pict[self.indexx]))
+        await interaction.response.edit_message(view=self)
+
+    async def interaction_check(self, interaction) -> bool:
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message("this button isn't for you", ephemeral=True)
+            return False
+        else:
+            return True
+
+    async def on_timeout(self) -> None:
+        await self.ctx.send("Timeout")
+
+
+def makenewb(link):
+    embed = discord.Embed(
+        title="NEWBIE REWARD", description="Pick one of the listed and remember you can only claim **ONCE**\nReward are material only and weapon excluded", color=discord.Colour.teal())
+    embed.set_image(url=link)
+    return embed
+
+
 class MHFZ_User_Interactive(commands.Cog):
     """ all the command needed to connect to your Mhfz game """
 
@@ -409,12 +452,12 @@ class MHFZ_User_Interactive(commands.Cog):
         await user.send(f"downloaded all {char.name} not empty character data")
         await ctx.channel.send("dm'd")
 
-    @commands.command()
-    async def claim_newb(self, ctx, arg):
-        list = ["BGM01", "BGM02", "BGM03", "BGM04", "BGM05", "BGM06"]
-        if arg not in list:
-            await ctx.send("i cant recognize set, check your spelling")
-            return
+    @commands.hybrid_command(name="claim_newb", description="calim newbie gift")
+    async def claim_newb(self, ctx):
+        await ctx.interaction.response.defer()
+        list1 = ["BGM01", "BGM02", "BGM03", "BGM04", "BGM05", "BGM06"]
+        list2 = ["https://cdn.discordapp.com/attachments/963379709050224680/963384013031112735/Donru_BM.png", "https://cdn.discordapp.com/attachments/963379709050224680/963384757482295316/Donru_Lance.png", "https://cdn.discordapp.com/attachments/963379709050224680/963385440021385246/Donru_GS.png",
+                 "https://cdn.discordapp.com/attachments/963379709050224680/963386086866960384/Donru_LBG_HBG.png", "https://cdn.discordapp.com/attachments/963379709050224680/963386248523821056/Donru_Bow.png", "https://cdn.discordapp.com/attachments/963379709050224680/963387216636309565/Donru_HH_Support.png"]
         a = ctx.message.author.id
         set_up()
         try:
@@ -428,9 +471,15 @@ class MHFZ_User_Interactive(commands.Cog):
             return
         else:
             gr = int(char.gr)
-            if 200 <= gr < 500:
-                char.newbie_rw(arg)
-                await ctx.send("reward already distributed")
+            if 200 <= gr < 1000:
+                msg = await ctx.send(embed=makenewb(list2[0]))
+                views = NewbView(ctx, msg, list2, list1)
+                vew = await ctx.send(view=views)
+                await views.wait()
+                if views.value:
+                    await ctx.send("reward already distributed")
+                    char.newbie_rw(views.value)
+                await vew.delete()
             else:
                 await ctx.send("GR requirement not met")
 

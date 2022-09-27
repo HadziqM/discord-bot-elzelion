@@ -144,8 +144,8 @@ class Guide_Help(commands.Cog):
                         value='this command will make all your login boost to available this command have a week cooldown', inline=False)
         embed.add_field(name='!rain myboost_off',
                         value='this command will make all your login boost to cooldown', inline=False)
-        embed.add_field(name='!rain claim_newb',
-                        value='to claim newbie reward yourself if you havent claim b4 and you still on range GR200-500\n\n```\n!rain claim_newb BGM01\n!rain claim_newb BGM02\n!rain claim_newb BGM03\n!rain claim_newb BGM04\n!rain claim_newb BGM05\n!rain claim_newb BGM06\n```\n```\nBGM01 -> Blademaster Generic Mixset 01\nBGM02 -> Blademaster Generic Mixset 03\nBGM03 -> Blademaster Generic Mixset 03\nBGM04 -> Gunner Generic Mixset 01\nBGM05 -> Gunner Generic Mixset 02\nBGM06 -> Blademaster Generic Support Mixset 01\n```', inline=False)
+        embed.add_field(name='!rain claim_newb or /claim_newb',
+                        value='to claim newbie reward yourself , this only work once per account and only if you at range gr200 - gr500', inline=False)
         embed.add_field(name='/mycard',
                         value='this to show your card and have various of button for convinience', inline=False)
         embed.add_field(name='!rain mygacha or right click your profile > app > event ',
