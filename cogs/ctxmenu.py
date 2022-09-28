@@ -2,7 +2,7 @@ from importlib.resources import contents
 from direc import *
 from base import *
 import discord
-from discord.ui import View
+from discord.ui import View, TextInput, Modal
 from bounty_cog import *
 
 
@@ -68,6 +68,23 @@ class SubmitC(View):
 
     async def on_timeout(self) -> None:
         await self.ctx.followup.send("Timeout")
+
+
+class Questionnaire(Modal):
+    def __init__(self, link):
+        super().__init__(title='Transmog Contest Sumbmission Form', timeout=None)
+        self.link = link
+    name = TextInput(label='Transmog Title',
+                     placeholder="your transmo title", required=True)
+    answer = TextInput(label='Description',
+                       style=discord.TextStyle.paragraph, required=True)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.send_message(f'Your Participation Been Submitted {self.name}!', ephemeral=True)
+        embed = discord.Embed(
+            title=self.name, description=self.answer, color=discord.Colour.blue())
+        embed.set_image(url=self.link)
+        await interaction.followup.send(embed=embed)
 
 
 async def mcard(member, interact):
@@ -153,3 +170,10 @@ async def msubmit_multi(msg, interact, bot):
     await interact.followup.send(content=text, view=views, allowed_mentions=discord.AllowedMentions(roles=False, users=False, everyone=False))
     await views.wait()
     await submit_multi_after(bot, interact, views.value1, link, msg.content)
+
+
+async def transcontest(msg, interact, bot):
+    if str(msg.attachments) == '[]':
+        return await interact.response.send_message("there is no attachments/image")
+    link = msg.attachments[0].url
+    await interact.response.send_modal(Questionnaire(link))

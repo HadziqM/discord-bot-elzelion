@@ -18,7 +18,7 @@ print('start')
 
 
 async def main():
-    extension = ['cogs.test', "cogs.server", "cogs.bounty_cog", "cogs.char"]
+    extension = ['cogs.test', 'cogs.server']
     for i in extension:
         await bot.load_extension(i)
     print('confirming token')
@@ -35,14 +35,19 @@ async def mycard(interaction: discord.Interaction, member: discord.Member):
     await mevent(member, interaction)
 
 
-@bot.tree.context_menu(name="bounty_submit", guild=discord.Object(937230168223789066))
+@bot.tree.context_menu(name="bounty_submit", guild=discord.Object(998783776807194664))
 async def mycard(interaction: discord.Interaction, msg: discord.Message):
     await msubmit(msg, interaction, bot)
 
 
-@bot.tree.context_menu(name="bounty_submit_multi", guild=discord.Object(937230168223789066))
+@bot.tree.context_menu(name="bounty_submit_multi", guild=discord.Object(998783776807194664))
 async def mycard(interaction: discord.Interaction, msg: discord.Message):
     await msubmit_multi(msg, interaction, bot)
+
+
+@bot.tree.context_menu(name="Transmog Contest", guild=discord.Object(937230168223789066))
+async def mycard(interaction: discord.Interaction, msg: discord.Message):
+    await transcontest(msg, interaction, bot)
 
 if __name__ == '__main__':
     discord.utils.setup_logging()
