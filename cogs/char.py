@@ -1,9 +1,8 @@
-from textwrap import indent
-from unicodedata import name
+from turtle import color
 import discord
-import asyncio
 from discord import app_commands
-from discord.ui import View, Button
+from discord.app_commands import Choice
+from discord.ui import View
 from datetime import datetime as dt
 from discord.ext import commands
 from discord.utils import get

@@ -70,21 +70,49 @@ class SubmitC(View):
         await self.ctx.followup.send("Timeout")
 
 
+class MezFez(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=120)
+        self.ctx = ctx
+        self.value1 = None
+
+    @discord.ui.select(placeholder="Bounty Title", min_values=1, max_values=1, options=[discord.SelectOption(label='BBQ01', value='BBQ01'), discord.SelectOption(label='BBQ02', value='BBQ02'), discord.SelectOption(label='BBQ03', value='BBQ03'), discord.SelectOption(label='BBQ04', value='BBQ04'), discord.SelectOption(label='BBQ05', value='BBQ05'), discord.SelectOption(label='BBQ06', value='BBQ06'), discord.SelectOption(label='BBQ07', value='BBQ07'), discord.SelectOption(label='BBQ08', value='BBQ08'), discord.SelectOption(label='BBQ09', value='BBQ09'), discord.SelectOption(label='BBQ10', value='BBQ10'), discord.SelectOption(label='BBQ11', value='BBQ11'), discord.SelectOption(label='BBQ12', value='BBQ12'), discord.SelectOption(label='BBQ13', value='BBQ13'), discord.SelectOption(label='BBQ14', value='BBQ14'), discord.SelectOption(label='BBQ15', value='BBQ15'), discord.SelectOption(label='BBQ16', value='BBQ16'), discord.SelectOption(label='BBQ17', value='BBQ17'), discord.SelectOption(label='BBQ18', value='BBQ18'), discord.SelectOption(label='BBQ19', value='BBQ19'), discord.SelectOption(label='BBQ20', value='BBQ20'), discord.SelectOption(label='BBQ21', value='BBQ21'), discord.SelectOption(label='BBQ22', value='BBQ22'), discord.SelectOption(label='BBQ23', value='BBQ23'), discord.SelectOption(label='SP', value='SP')])
+    async def getone(self, interaction, select):
+        select.disabled = True
+        await interaction.response.edit_message(view=self)
+        self.value1 = select.values[0]
+        self.stop()
+
+    async def interaction_check(self, interaction):
+        if interaction.user != self.ctx.user:
+            await interaction.response.send_message("this button isn't for you", ephemeral=True)
+            return False
+        else:
+            return True
+
+    async def on_timeout(self) -> None:
+        await self.ctx.followup.send("Timeout")
+
+
 class Questionnaire(Modal):
-    def __init__(self, link):
-        super().__init__(title='Transmog Contest Sumbmission Form', timeout=None)
+    def __init__(self, link, ch):
+        super().__init__(title='Transmog Contest Form', timeout=None)
         self.link = link
+        self.ch = ch
     name = TextInput(label='Transmog Title',
                      placeholder="your transmo title", required=True)
     answer = TextInput(label='Description',
                        style=discord.TextStyle.paragraph, required=True)
 
     async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f'Your Participation Been Submitted {self.name}!', ephemeral=True)
+        await interaction.response.send_message(f'Your Participation Been Submitted!', ephemeral=True)
         embed = discord.Embed(
             title=self.name, description=self.answer, color=discord.Colour.blue())
         embed.set_image(url=self.link)
-        await interaction.followup.send(embed=embed)
+        embed.set_thumbnail(url=interaction.user.display_avatar.url)
+        embed.set_footer(text=f"Submited by: {interaction.user.display_name}")
+        msg = await self.ch.send(embed=embed)
+        await msg.add_reaction('👍')
 
 
 async def mcard(member, interact):
@@ -173,7 +201,30 @@ async def msubmit_multi(msg, interact, bot):
 
 
 async def transcontest(msg, interact, bot):
+    channel = bot.get_channel(1024593377423011850)
+    if interact.user.id != msg.author.id:
+        return await interact.response.send_message("its not your own")
     if str(msg.attachments) == '[]':
         return await interact.response.send_message("there is no attachments/image")
     link = msg.attachments[0].url
-    await interact.response.send_modal(Questionnaire(link))
+    await interact.response.send_modal(Questionnaire(link, channel))
+
+
+async def mezcontest(msg, interact, bot):
+    channel = bot.get_channel(1024593511401668648)
+    if interact.user.id != msg.author.id:
+        return await interact.response.send_message("its not your own")
+    if str(msg.attachments) == '[]':
+        return await interact.response.send_message("there is no attachments/image")
+    link = msg.attachments[0].url
+    view = MezFez(interact)
+    color = [discord.Colour.blue(), discord.Colour.red(
+    ), discord.Colour.yellow(), discord.Colour.green(), discord.Colour.teal()]
+    await interact.response.send_message(view=view)
+    await view.wait()
+    embed = discord.Embed(
+        title=view.value1, color=discord.Colour.blue())
+    embed.set_image(url=link)
+    embed.set_thumbnail(url=interact.user.display_avatar.url)
+    embed.set_footer(text=f"Submited by: {interact.user.display_name}")
+    msg = await channel.send(embed=embed)

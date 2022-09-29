@@ -115,7 +115,6 @@ class Server_Exclusive_Command(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.is_owner()
     async def sync(self, ctx, spec):
         if spec == "~":
             synced = await ctx.bot.tree.sync(guild=ctx.guild)

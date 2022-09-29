@@ -192,9 +192,8 @@ async def mannounce(bot, ch, a, arg, methode):
 
 
 class MyView(View):
-    def __init__(self, ctx):
+    def __init__(self):
         super().__init__(timeout=None)
-        self.ctx = ctx
         self.value = None
 
     @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
@@ -214,9 +213,9 @@ class MyView(View):
         self.stop()
 
 
-async def appoval_s(interaction, ch, ch1, did, bbq, picture, name, mt, time, bot):
+async def appoval_s(channel, ch, ch1, did, bbq, picture, name, mt, time, bot, now):
     confirm = await mannounce(bot, ch, [did, name], [bbq, picture], mt)
-    view = MyView(interaction)
+    view = MyView()
     msg = await ch.send(view=view)
     await view.wait()
     if view.value == 'y':
@@ -224,17 +223,17 @@ async def appoval_s(interaction, ch, ch1, did, bbq, picture, name, mt, time, bot
         arg = [bbq, picture, [did], mt]
         await msg.delete()
         await confirm.delete()
-        await interaction.followup.send(f"<@{did}> your bounty had been approved by {view.uss}")
+        await channel.send(f"<@{did}> your bounty had been approved by {view.uss}")
         if mt == "solo":
             await mannounce(bot, ch_an, [did, name], [bbq, picture], mt)
-            await announce(bot, interaction, arg)
+            await announce(bot, channel, arg, now)
         else:
             await mannounce(bot, ch_an, [did, name], [bbq, picture], mt)
-            await announce(bot, interaction, arg)
+            await announce(bot, channel, arg, now)
     elif view.value == 'n':
         await msg.delete()
         await confirm.delete()
-        await interaction.followup.send(f"<@{did}> your bounty isnt approved by {view.uss}")
+        await channel.send(f"<@{did}> your bounty isnt approved by {view.uss}")
         set_up()
         bon = bounty(bbq)
         bon.cooldown_set(bon.cooldown+1)
@@ -243,9 +242,9 @@ async def appoval_s(interaction, ch, ch1, did, bbq, picture, name, mt, time, bot
         await mbounty(ch1)
 
 
-async def approve_m(interaction, ch, ch1, bbq, picture, anjir, lgt, time, bot, did):
+async def approve_m(channel, ch, ch1, bbq, picture, anjir, lgt, time, bot, did, now):
     confirm = await mannounce(bot, ch, anjir, [bbq, picture], "multi")
-    view = MyView(ctx=interaction)
+    view = MyView()
     msg = await ch.send(view=view)
     await view.wait()
     if view.value == 'y':
@@ -253,11 +252,11 @@ async def approve_m(interaction, ch, ch1, bbq, picture, anjir, lgt, time, bot, d
         arg = [bbq, picture, did, "multi"]
         await msg.delete()
         await confirm.delete()
-        await interaction.followup.send(f"<@{anjir[0]}> submision and co. had been approved by {view.uss}")
+        await channel.send(f"<@{anjir[0]}> submision and co. had been approved by {view.uss}")
         await mannounce(bot, ch_an, anjir, [bbq, picture], "multi")
-        await announce(bot, interaction, arg)
+        await announce(bot, channel, arg, now)
     elif view.value == 'n':
-        await interaction.followup.send(f"<@{anjir[0]}> submision and co. isnt approved by {view.uss}")
+        await channel.send(f"<@{anjir[0]}> submision and co. isnt approved by {view.uss}")
         await msg.delete()
         await confirm.delete()
         set_up()
@@ -268,7 +267,7 @@ async def approve_m(interaction, ch, ch1, bbq, picture, anjir, lgt, time, bot, d
         await mbounty(ch1)
 
 
-async def announce(bot, ctx, arg):
+async def announce(bot, channel, arg, now):
     ch2 = bot.get_channel(lead)
     ch3 = bot.get_channel(promo)
     ch4 = bot.get_channel(1009415908927733811)
@@ -277,40 +276,43 @@ async def announce(bot, ctx, arg):
     if arg[3] == "solo":
         gac = gacha(arg[2][0])
         gac.set_bbq(arg[0])
+        gac.set_bbq_time(now)
         cid = check_disc(arg[2][0])
         a = bon.announce_now('solo', cid)
         if a[-1] == 0:
-            await ctx.followup.send(f"<@{arg[2][0]}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
+            await channel.send(f"<@{arg[2][0]}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
         else:
-            await ctx.followup.send(f"<@{arg[2][0]}> reward already distributed, claim it before bounty white day")
-        await mpromote(ctx.guild, a[-2], ctx.guild.get_member(int(a[0])), ch3, cid)
+            await channel.send(f"<@{arg[2][0]}> reward already distributed, claim it before bounty white day")
+        await mpromote(channel.guild, a[-2], channel.guild.get_member(int(a[0])), ch3, cid)
     elif arg[3] == 'npc':
         gac = gacha(arg[2][0])
         gac.set_bbq(arg[0])
+        gac.set_bbq_time(now)
         cid = check_disc(arg[2][0])
         cid = check_disc(arg[2][0])
         a = bon.announce_now('cat', cid)
         if a[-1] == 0:
-            await ctx.followup.send(f"<@{arg[2][0]}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
+            await channel.send(f"<@{arg[2][0]}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
         else:
-            await ctx.followup.send(f"<@{arg[2][0]}> reward already distributed, claim it before bounty white day")
-        await mpromote(ctx.guild, a[-2], ctx.guild.get_member(int(a[0])), ch3, cid)
+            await channel.followup.send(f"<@{arg[2][0]}> reward already distributed, claim it before bounty white day")
+        await mpromote(channel.guild, a[-2], channel.guild.get_member(int(a[0])), ch3, cid)
     else:
         cid = []
         for i in arg[2]:
             did = i
             gac = gacha(did)
             gac.set_bbq(arg[0])
+            gac.set_bbq_time(now)
             cidi = check_disc(did)
             cid.append(cidi)
         a, b, c, d = bon.announce_now('multi', cid)
         for i in range(len(cid)):
             a.append(b[i])
             if c[i] == 0:
-                await ctx.followup.send(f"<@{a[i]}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
+                await channel.send(f"<@{a[i]}> since reward for current bounty is too much, it cant be distributed in game trough normal mean, coordinate with EVE to get your reward")
             else:
-                await ctx.followup.send(f"<@{a[i]}> reward already distributed, claim it before bounty white day")
-            await mpromote(ctx.guild, d[i], ctx.guild.get_member(int(a[i])), ch3, cid[i])
+                await channel.send(f"<@{a[i]}> reward already distributed, claim it before bounty white day")
+            await mpromote(channel.guild, d[i], channel.guild.get_member(int(a[i])), ch3, cid[i])
     await mleaderboard(bot, ch2, ch4)
 
 
@@ -322,7 +324,7 @@ async def submit_solo_after(bot, interaction, bbq, picture_link, methode):
     elif gac.bbq != bbq and now < (gac.bbq_time + 60*60*24):
         return await interaction.followup.send(f"sorry you cant take this bounty before <t:{gac.bbq_time+60*60*24}:R>")
     time = gac.bbq_time
-    gac.set_bbq_time(int(dt.timestamp(dt.now())))
+    # gac.set_bbq_time(int(dt.timestamp(dt.now())))
     ch = bot.get_channel(1020947766203129876)
     ch1 = bot.get_channel(cd)
     set_up()
@@ -343,8 +345,9 @@ async def submit_solo_after(bot, interaction, bbq, picture_link, methode):
     await interaction.followup.send("submitted your form\nwait for admin aproval")
     char = character(cid)
     bon.cooldown_now()
+    channel = interaction.channel
     await mbounty(ch1)
-    await appoval_s(interaction, ch, ch1, did, bbq, picture_link, char.name, methode, time, bot)
+    await appoval_s(channel, ch, ch1, did, bbq, picture_link, char.name, methode, time, bot, now)
 
 
 async def submit_multi_after(bot, interaction, bbq, picture_link, mentions):
@@ -398,7 +401,7 @@ async def submit_multi_after(bot, interaction, bbq, picture_link, mentions):
         anjir.append(char.name)
     lgt = len(cid)
     print(anjir)
-    await approve_m(interaction, ch, ch1, bbq, picture_link, anjir, lgt, time, bot, did)
+    await approve_m(interaction.channel, ch, ch1, bbq, picture_link, anjir, lgt, time, bot, did, now)
 
 
 class Bounty_Event(commands.Cog):
