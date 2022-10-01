@@ -1,4 +1,3 @@
-from asyncore import read
 from data import *
 
 
@@ -20,6 +19,10 @@ def numb(val):
         return 0
     else:
         return val
+
+
+def add_mez(did):
+    cur.execute(f"insert into mezfes (discord_id) values ('{did}')")
 
 
 def char_id(inp):
@@ -428,7 +431,7 @@ class character:
 
 class moderator:
     def bounty_refresh(self):
-        a = open(f"{QUERY_PATH}\\bounty_refresh.sql","r").read()
+        a = open(f"{QUERY_PATH}\\bounty_refresh.sql", "r").read()
         cur.execute(a)
 
     def leader_id(self, gid):
@@ -524,6 +527,14 @@ class moderator:
     def ticket_all(self):
         sql = 'select discord_id from discord order by gacha desc'
         cur.execute(sql)
+        return convert(cur.fetchall())
+
+    def mez_lead(self):
+        cur.execute("SELECT discord_id FROM mezfes order by total desc")
+        return convert(cur.fetchall())
+
+    def mez_tot(self):
+        cur.execute("SELECT total FROM mezfes order by total desc")
         return convert(cur.fetchall())
 
     def mog_all(self):
@@ -790,3 +801,69 @@ class gacha:
         self.ticket += value
         sql = f" UPDATE discord SET gacha={self.ticket} WHERE discord_id='{self.did}' "
         cur.execute(sql)
+
+
+class mezfes:
+    def __init__(self, did):
+        set_up()
+        sql = f'''SELECT panic_honey FROM mezfes where discord_id = '{did}' '''
+        cur.execute(sql)
+        self.honey = cur.fetchone()[0]
+        sql = f'''SELECT guuku_scoop FROM mezfes where discord_id = '{did}' '''
+        cur.execute(sql)
+        self.scoop = cur.fetchone()[0]
+        sql = f'''select dokkan_battle_cats from mezfes where discord_id= '{did}' '''
+        cur.execute(sql)
+        self.cats = cur.fetchone()[0]
+        sql = f'''SELECT nyanrendo FROM mezfes where discord_id = '{did}' '''
+        cur.execute(sql)
+        self.nyanrendo = cur.fetchone()[0]
+        sql = f'''select uruki_pachinko from mezfes where discord_id= '{did}' '''
+        cur.execute(sql)
+        self.pachinko = cur.fetchone()[0]
+        self.total = self.pachinko + self.nyanrendo + self.cats + self.scoop + self.honey
+        self.did = did
+
+    def totall(self):
+        return self.pachinko + self.nyanrendo + self.cats + self.scoop + self.honey
+
+    def set_honey(self, value):
+        self.honey = value
+        sql = f''' UPDATE mezfes SET panic_honey={value} WHERE discord_id='{self.did}' '''
+        cur.execute(sql)
+        total = self.totall()
+        cur.execute(
+            f"UPDATE mezfes SET total={total} WHERE discord_id='{self.did}'")
+
+    def set_scoop(self, value):
+        self.honey = value
+        sql = f''' UPDATE mezfes SET guuku_scoop={value} WHERE discord_id='{self.did}' '''
+        cur.execute(sql)
+        total = self.totall()
+        cur.execute(
+            f"UPDATE mezfes SET total={total} WHERE discord_id='{self.did}'")
+
+    def set_cats(self, value):
+        self.honey = value
+        self.totall()
+        sql = f''' UPDATE mezfes SET dokkan_battle_cats={value} WHERE discord_id='{self.did}' '''
+        cur.execute(sql)
+        total = self.totall()
+        cur.execute(
+            f"UPDATE mezfes SET total={total} WHERE discord_id='{self.did}'")
+
+    def set_nyanrendo(self, value):
+        self.honey = value
+        sql = f''' UPDATE mezfes SET nyanrendo={value} WHERE discord_id='{self.did}' '''
+        cur.execute(sql)
+        total = self.totall()
+        cur.execute(
+            f"UPDATE mezfes SET total={total} WHERE discord_id='{self.did}'")
+
+    def set_pachinko(self, value):
+        self.honey = value
+        sql = f''' UPDATE mezfes SET uruki_pachinko={value} WHERE discord_id='{self.did}' '''
+        cur.execute(sql)
+        total = self.totall()
+        cur.execute(
+            f"UPDATE mezfes SET total={total} WHERE discord_id='{self.did}'")

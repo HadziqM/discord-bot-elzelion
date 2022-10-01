@@ -51,10 +51,6 @@ async def mycard4(interaction: discord.Interaction, msg: discord.Message):
     await transcontest(msg, interaction, bot)
 
 
-@bot.tree.context_menu(name="Mezfes Contest", guild=discord.Object(937230168223789066))
-async def mycard5(interaction: discord.Interaction, msg: discord.Message):
-    await mezcontest(msg, interaction, bot)
-
 if __name__ == '__main__':
     discord.utils.setup_logging()
     asyncio.run(main())

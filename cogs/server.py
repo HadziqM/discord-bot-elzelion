@@ -1,6 +1,9 @@
+from typing import Literal
+from unicodedata import name
 import discord
 import random
 from discord.ext import commands
+from discord import app_commands
 from discord.ui import View
 from direc import *
 from base import *
@@ -15,6 +18,23 @@ def mguild(dick):
     for i in dick:
         embed.add_field(
             name=i, value=f'Guild ID : {dick[i][0]}\n Member : {dick[i][1]}/60\nLead ID : {dick[i][2]}', inline=False)
+    return embed
+
+
+async def mmez(bot):
+    embed = discord.Embed(title='Mezfest Leaderboard',
+                          color=discord.Color.green())
+    mod = moderator()
+    li = mod.mez_lead()
+    lu = mod.mez_tot()
+    user = await bot.fetch_user(int(li[0]))
+    embed.set_thumbnail(url=user.avatar)
+    la = len(li)
+    if la > 5:
+        la = 5
+    for i in range(la):
+        ass = await bot.fetch_user(int(li[i]))
+        embed.add_field(name=ass, value=f"Total Point : {lu[i]}")
     return embed
 
 
@@ -128,6 +148,36 @@ class Server_Exclusive_Command(commands.Cog):
         else:
             synced = await ctx.bot.tree.sync()
         await ctx.send(f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}")
+
+    @app_commands.commands(name="mezfes", description="submit mezfes form")
+    @commands.has_role(1021645362974441513)
+    @commands.guild_only()
+    async def sync(self, interaction: discord.Interaction, mention: discord.Member, mez_title: Literal['Panic Honey', 'Guuku Scoop', 'Dokkan! Battle Cats', 'Nyanrendo', 'Uruki Pachinko'], mez_point: str):
+        await interaction.response.defer()
+        ch = self.bot.get_channel(1025595703403220992)
+        oke = ['Panic Honey', 'Guuku Scoop',
+               'Dokkan! Battle Cats', 'Nyanrendo', 'Uruki Pachinko']
+        try:
+            mez = mezfes(mention)
+        except:
+            add_mez(mention)
+            mez = mezfes(mention)
+        if mez_title == oke[0]:
+            mez.set_honey(int(mez_point))
+            ch.send(embed=await mmez(self.bot))
+        elif mez_title == oke[1]:
+            mez.set_scoop(int(mez_point))
+            ch.send(embed=await mmez(self.bot))
+        elif mez_title == oke[2]:
+            mez.set_cats(int(mez_point))
+            ch.send(embed=await mmez(self.bot))
+        elif mez_title == oke[3]:
+            mez.set_nyanrendo(int(mez_point))
+            ch.send(embed=await mmez(self.bot))
+        elif mez_title == oke[4]:
+            mez.set_pachinko(int(mez_point))
+            ch.send(embed=await mmez(self.bot))
+        await interaction.followup.send("success")
 
 
 async def setup(bot):

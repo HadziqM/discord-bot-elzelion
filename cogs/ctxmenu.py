@@ -1,4 +1,3 @@
-from importlib.resources import contents
 from direc import *
 from base import *
 import discord
@@ -76,7 +75,7 @@ class MezFez(View):
         self.ctx = ctx
         self.value1 = None
 
-    @discord.ui.select(placeholder="Bounty Title", min_values=1, max_values=1, options=[discord.SelectOption(label='BBQ01', value='BBQ01'), discord.SelectOption(label='BBQ02', value='BBQ02'), discord.SelectOption(label='BBQ03', value='BBQ03'), discord.SelectOption(label='BBQ04', value='BBQ04'), discord.SelectOption(label='BBQ05', value='BBQ05'), discord.SelectOption(label='BBQ06', value='BBQ06'), discord.SelectOption(label='BBQ07', value='BBQ07'), discord.SelectOption(label='BBQ08', value='BBQ08'), discord.SelectOption(label='BBQ09', value='BBQ09'), discord.SelectOption(label='BBQ10', value='BBQ10'), discord.SelectOption(label='BBQ11', value='BBQ11'), discord.SelectOption(label='BBQ12', value='BBQ12'), discord.SelectOption(label='BBQ13', value='BBQ13'), discord.SelectOption(label='BBQ14', value='BBQ14'), discord.SelectOption(label='BBQ15', value='BBQ15'), discord.SelectOption(label='BBQ16', value='BBQ16'), discord.SelectOption(label='BBQ17', value='BBQ17'), discord.SelectOption(label='BBQ18', value='BBQ18'), discord.SelectOption(label='BBQ19', value='BBQ19'), discord.SelectOption(label='BBQ20', value='BBQ20'), discord.SelectOption(label='BBQ21', value='BBQ21'), discord.SelectOption(label='BBQ22', value='BBQ22'), discord.SelectOption(label='BBQ23', value='BBQ23'), discord.SelectOption(label='SP', value='SP')])
+    @discord.ui.select(placeholder="MezFest Minigame", min_values=1, max_values=1, options=[discord.SelectOption(label="Panic Honey", value="Panic Honey"), discord.SelectOption(label="Guuku Scoop", value="Guuku Scoop"), discord.SelectOption(label="Dokkan! Battle Cats", value="Dokkan! Battle Cats"), discord.SelectOption(label="Nyanrendo", value="Nyanrendo"), discord.SelectOption(label="Uruki Pachinko", value="Uruki Pachinko")])
     async def getone(self, interaction, select):
         select.disabled = True
         await interaction.response.edit_message(view=self)
@@ -212,19 +211,30 @@ async def transcontest(msg, interact, bot):
 
 async def mezcontest(msg, interact, bot):
     channel = bot.get_channel(1024593511401668648)
+    channel2 = bot.get_channel(1024593511401668648)
     if interact.user.id != msg.author.id:
         return await interact.response.send_message("its not your own")
     if str(msg.attachments) == '[]':
         return await interact.response.send_message("there is no attachments/image")
+    try:
+        value = int(msg.content)
+    except:
+        return await interact.response.send_message("points detected or invalid format")
     link = msg.attachments[0].url
     view = MezFez(interact)
+    await interact.response.send_message(view=view)
     color = [discord.Colour.blue(), discord.Colour.red(
     ), discord.Colour.yellow(), discord.Colour.green(), discord.Colour.teal()]
-    await interact.response.send_message(view=view)
+    oke = ['Panic Honey', 'Guuku Scoop',
+           'Dokkan! Battle Cats', 'Nyanrendo', 'Uruki Pachinko']
     await view.wait()
+    msg = await channel2.send(embed=makefes(value, view.value1, interact.user.display_name, color[oke.index(view.value1)], link, interact.user.display_avatar.url))
+
+
+def makefes(value, title, name, color, link, avatar):
     embed = discord.Embed(
-        title=view.value1, color=discord.Colour.blue())
+        title=title, description=f'git {value} points', color=color)
     embed.set_image(url=link)
-    embed.set_thumbnail(url=interact.user.display_avatar.url)
-    embed.set_footer(text=f"Submited by: {interact.user.display_name}")
-    msg = await channel.send(embed=embed)
+    embed.set_thumbnail(url=avatar)
+    embed.set_footer(text=f"Submited by: {name}")
+    return embed
