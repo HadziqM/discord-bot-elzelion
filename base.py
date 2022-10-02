@@ -542,6 +542,9 @@ class moderator:
         sql = '''UPDATE characters SET skin_hist=(decode('%s','hex')) '''
         cur.execute(sql % hexa)
 
+    def set_bbq_time_all(self):
+        cur.execute("UPDATE discord SET latest_bounty_time=0")
+
     def log_tof_all(self):
         sql = ''' UPDATE public.login_boost_state SET end_time = 1'''
         cur.execute(sql)

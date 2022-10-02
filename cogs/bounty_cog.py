@@ -260,8 +260,9 @@ async def approve_m(channel, ch, ch1, bbq, picture, anjir, lgt, time, bot, did, 
         await msg.delete()
         await confirm.delete()
         set_up()
-        for i in range(lgt):
-            gacha(anjir[i]).set_bbq_time(time[i])
+        if bbq != "BBQ16":
+            for i in range(lgt):
+                gacha(anjir[i]).set_bbq_time(time[i])
         bon = bounty(bbq)
         bon.cooldown_set(bon.cooldown+1)
         await mbounty(ch1)
@@ -383,15 +384,14 @@ async def submit_multi_after(bot, interaction, bbq, picture_link, mentions):
         await interaction.followup.send("use submit_npc instead")
         return
     time = []
-    for i in did:
-        gac = gacha(i)
-        if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
-            return await interaction.followup.send(f"sorry <@{i}> cant take same bounty before <t:{gac.bbq_time+60*60*48}:R>")
-        elif gac.bbq != bbq and now < (gac.bbq_time + 60*60*24):
-            return await interaction.followup.send(f"sorry <@{i}> cant take this bounty before <t:{gac.bbq_time+60*60*24}:R>")
-        time.append(gac.bbq_time)
-    for i in did:
-        gac.set_bbq_time(int(dt.timestamp(dt.now())))
+    if bbq != "BBQ16":
+        for i in did:
+            gac = gacha(i)
+            if gac.bbq == bbq and now < (gac.bbq_time + 60*60*48):
+                return await interaction.followup.send(f"sorry <@{i}> cant take same bounty before <t:{gac.bbq_time+60*60*48}:R>")
+            elif gac.bbq != bbq and now < (gac.bbq_time + 60*60*24):
+                return await interaction.followup.send(f"sorry <@{i}> cant take this bounty before <t:{gac.bbq_time+60*60*24}:R>")
+            time.append(gac.bbq_time)
     await interaction.followup.send("sent your team submission to admin")
     bon.cooldown_now()
     await mbounty(ch1)
@@ -474,10 +474,9 @@ class Bounty_Event(commands.Cog):
     @commands.hybrid_command(name="reset_cd_bounty_all", description="refresh all person cd bounty")
     @commands.has_role(mod_id)
     async def reset_cd_all(self, ctx):
-        await ctx.interaction.response.defer()
-        for i in moderator.disc_all():
-            gac = gacha(i)
-            gac.set_bbq_time(0)
+        set_up()
+        mod = moderator()
+        mod.set_bbq_time_all()
         await ctx.send(f"succesfully change all player last clear to None")
 
 

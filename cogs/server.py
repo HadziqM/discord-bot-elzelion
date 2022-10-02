@@ -149,35 +149,35 @@ class Server_Exclusive_Command(commands.Cog):
             synced = await ctx.bot.tree.sync()
         await ctx.send(f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}")
 
-    @app_commands.commands(name="mezfes", description="submit mezfes form")
-    @commands.has_role(1021645362974441513)
-    @commands.guild_only()
-    async def sync(self, interaction: discord.Interaction, mention: discord.Member, mez_title: Literal['Panic Honey', 'Guuku Scoop', 'Dokkan! Battle Cats', 'Nyanrendo', 'Uruki Pachinko'], mez_point: str):
-        await interaction.response.defer()
-        ch = self.bot.get_channel(1025595703403220992)
-        oke = ['Panic Honey', 'Guuku Scoop',
-               'Dokkan! Battle Cats', 'Nyanrendo', 'Uruki Pachinko']
-        try:
-            mez = mezfes(mention)
-        except:
-            add_mez(mention)
-            mez = mezfes(mention)
-        if mez_title == oke[0]:
-            mez.set_honey(int(mez_point))
-            ch.send(embed=await mmez(self.bot))
-        elif mez_title == oke[1]:
-            mez.set_scoop(int(mez_point))
-            ch.send(embed=await mmez(self.bot))
-        elif mez_title == oke[2]:
-            mez.set_cats(int(mez_point))
-            ch.send(embed=await mmez(self.bot))
-        elif mez_title == oke[3]:
-            mez.set_nyanrendo(int(mez_point))
-            ch.send(embed=await mmez(self.bot))
-        elif mez_title == oke[4]:
-            mez.set_pachinko(int(mez_point))
-            ch.send(embed=await mmez(self.bot))
-        await interaction.followup.send("success")
+    # @app_commands.commands(name="mezfes", description="submit mezfes form")
+    # @commands.has_role(1021645362974441513)
+    # @commands.guild_only()
+    # async def sync(self, interaction: discord.Interaction, mention: discord.Member, mez_title: Literal['Panic Honey', 'Guuku Scoop', 'Dokkan! Battle Cats', 'Nyanrendo', 'Uruki Pachinko'], mez_point: str):
+    #     await interaction.response.defer()
+    #     ch = self.bot.get_channel(1025595703403220992)
+    #     oke = ['Panic Honey', 'Guuku Scoop',
+    #            'Dokkan! Battle Cats', 'Nyanrendo', 'Uruki Pachinko']
+    #     try:
+    #         mez = mezfes(mention)
+    #     except:
+    #         add_mez(mention)
+    #         mez = mezfes(mention)
+    #     if mez_title == oke[0]:
+    #         mez.set_honey(int(mez_point))
+    #         ch.send(embed=await mmez(self.bot))
+    #     elif mez_title == oke[1]:
+    #         mez.set_scoop(int(mez_point))
+    #         ch.send(embed=await mmez(self.bot))
+    #     elif mez_title == oke[2]:
+    #         mez.set_cats(int(mez_point))
+    #         ch.send(embed=await mmez(self.bot))
+    #     elif mez_title == oke[3]:
+    #         mez.set_nyanrendo(int(mez_point))
+    #         ch.send(embed=await mmez(self.bot))
+    #     elif mez_title == oke[4]:
+    #         mez.set_pachinko(int(mez_point))
+    #         ch.send(embed=await mmez(self.bot))
+    #     await interaction.followup.send("success")
 
 
 async def setup(bot):
