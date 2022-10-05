@@ -3,6 +3,7 @@ from base import *
 import discord
 from discord.ui import View, TextInput, Modal
 from bounty_cog import *
+from datetime import datetime as dt
 
 
 icon1 = ['\\GS.png', '\\HS.png', '\\H.png', '\\L.png', '\\SS.png', '\\LB.png', '\\DS.png',
@@ -147,8 +148,17 @@ async def mcard(member, interact):
 
 
 async def mevent(member, interact):
+    now = int(dt.timestamp(dt.now()))
     user = member
     gac = gacha(member.id)
+    dif = gac.bbq_time + 24*60*60
+    sam = gac.bbq_time + 48*60*60
+    different = f"<t:{dif}:R>"
+    if dif <= now:
+        different = "You can do it now"
+    same = f"<t:{gac.bbq_time + 48*60*60}:R>"
+    if sam <= now:
+        same = "You can do it now"
     mod = moderator()
     try:
         rank = mod.disc_all().index(str(member.id))+1
@@ -158,7 +168,7 @@ async def mevent(member, interact):
     if gac.bbq_time == 0:
         x = "Not Yet"
     embed = discord.Embed(title="My Event Status",
-                          description=f'Bounty Coin : {gac.bounty}\nGacha Ticket : {gac.ticket}\nPity Count : {gac.pity}\nLatest Bounty : {gac.bbq}\nTime Cleared : {x}\nBounty Rank : {rank}', color=discord.Color.red())
+                          description=f'Bounty Coin : {gac.bounty}\nGacha Ticket : {gac.ticket}\nPity Count : {gac.pity}\nLatest Bounty : {gac.bbq}\nTime Cleared : {x}\nDifferent BBQ CD: {different}\nSame BBQ CD: {same}\nBounty Rank : {rank}', color=discord.Color.red())
     embed.set_author(name=user.display_name, icon_url=user.avatar)
     await interact.response.send_message(content=None, embed=embed)
 

@@ -4,6 +4,7 @@ from discord.ext import commands
 from discord.utils import get
 from direc import *
 from base import *
+from discord import app_commands
 main = database()
 mod_id = int(main.mod)
 
@@ -27,6 +28,14 @@ class Mod_Only_Command(commands.Cog):
         char.upload_save()
         char.upload_part()
         await ctx.channel.send(f'uploaded ID:{arg} file to server')
+
+    @app_commands.command(name="reset_boost_all", description="reset all player boost to active")
+    @commands.has_role(mod_id)
+    async def upload(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        mod = moderator()
+        mod.log_ton_all()
+        await interaction.followup.send("success")
 
     @commands.command()
     @commands.has_role(mod_id)
